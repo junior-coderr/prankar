@@ -1,24 +1,26 @@
 "use client";
 import React from "react";
-import Header from "@/components/custom/headbar";
+import Header from "../../components/custom/headbar";
 import { useState, useEffect, useRef } from "react";
 import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "../../components/ui/skeleton";
 import { IoIosExit } from "react-icons/io";
-import { Input } from "@/components/ui/input";
+import { Input } from "../../components/ui/input";
 import { motion } from "framer-motion";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
-import { setPhoneNo, setPrefix } from "@/app/redux/slices/phoneNoInput";
+import { setPhoneNo, setPrefix } from "../../app/redux/slices/phoneNoInput";
 import { IoIosArrowDropdownCircle } from "react-icons/io";
-import { useToast } from "@/components/hooks/use-toast";
-
+// import { useToast } from "../../components/hooks/use-toast";
+import { TbArrowBackUp } from "react-icons/tb";
+import SelectAudioCarousel from "../../components/custom/selectAudioCarousel";
+import AudioUploadCard from "../../components/custom/audioUploadCard";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from "../../components/ui/popover";
 
 import { Poppins } from "next/font/google";
 const poppins = Poppins({
@@ -32,8 +34,8 @@ const Page = () => {
 
   const [isImgLoading, setIsImgLoading] = useState(true);
   const prefixLengths = {
-    "+91": 10, // India
-    "+1": 10, // USA
+    "+91": 10, // India with prefix and space
+    "+1": 7, // USA
     "+44": 10, // UK
     // Add more country codes and their respective phone number lengths as needed
   };
@@ -98,17 +100,10 @@ const Page = () => {
     const [currentScroll, setCurrentScroll] = useState(0);
     const currentScrollRef = useRef(0);
     const [isActive, setIsActive] = useState(false);
-    const { toast } = useToast();
 
     const dispatch = useDispatch();
     const prefix = useSelector((state) => state.phoneNoInput.prefix);
     const phoneNo = useSelector((state) => state.phoneNoInput.value);
-    // dispatch(setPhoneNo(prefix + " "));
-
-    useEffect(() => {
-      const requiredLength = prefixLengths[prefix] || 10; // Default to 10 if prefix not found
-      setIsActive(phoneNo.length >= requiredLength);
-    }, [phoneNo, prefix]);
 
     // Handler for phone number input change
     const handlePhoneNoChange = (e) => {
@@ -119,6 +114,15 @@ const Page = () => {
       if (sanitizedInput !== input) {
         // If the input was sanitized, update the input field
         e.target.value = sanitizedInput;
+      }
+
+      if (
+        phoneNo.replace(/\s/g, "").slice(prefix.length).length >= 6 &&
+        phoneNo.replace(/\s/g, "").slice(prefix.length).length <= 12
+      ) {
+        setIsActive(true);
+      } else {
+        setIsActive(false);
       }
 
       dispatch(setPhoneNo(sanitizedInput));
@@ -149,9 +153,20 @@ const Page = () => {
 
     // Handler for continue button
     const handleContinue = () => {
+      console.log("phoneNo", phoneNo);
+      console.log("prefix", prefix);
+      console.log("prefixLengths[prefix]", prefixLengths[prefix]);
+      console.log("phoneNo.length", phoneNo.length);
+      console.log(
+        "test length",
+        phoneNo.replace(/\s/g, "").slice(prefix.length)
+      );
+
       if (
-        phoneNo.length === prefixLengths[prefix] &&
-        /^[6-9]\d{9}$/.test(phoneNo)
+        phoneNo.replace(/\s/g, "").slice(prefix.length).length >= 6 &&
+        phoneNo.replace(/\s/g, "").slice(prefix.length).length <=
+          // prefixLengths[prefix]
+          12
       ) {
         handleScroll("down");
         const resizeObserver = new ResizeObserver((entries) => {
@@ -180,20 +195,11 @@ const Page = () => {
       }
     };
 
-    // Effects for logging scroll state
-    useEffect(() => {
-      console.log("currentScroll (after update)", currentScroll);
-    }, [currentScroll]);
-
-    useEffect(() => {
-      console.log("currentScrollRef cc", currentScrollRef.current);
-    }, [currentScrollRef]);
-
     // JSX for Content component
-    return (
+    return isMobile != null ? (
       <div className={`${poppins.className} w-full h-[100%] `}>
         <section className="flex overflow-auto">
-          <div className="w-[100%] h-[calc(100svh-60px)] min-h-[300px] overflow-auto  flex items-center justify-center">
+          <div className="w-full h-[calc(100svh-60px)] min-h-[500px] overflow-auto  flex items-center justify-center">
             <div
               ref={scrollRef}
               className={`${
@@ -201,7 +207,13 @@ const Page = () => {
               } w-[75%] relative  min-w-[300px] inp_containe  overflow-hidden mx-auto h-[80%] bg-[#3f3f3f] rounded-md shadow-xl  border-[5px] border-[#444444]`}
             >
               {/* Phone number input section */}
-              <div className="w-[100%] h-[100%] flex flex-col items-center justify-center bg-[#444444]">
+              <div className="w-[100%] h-[100%] relative flex flex-col items-center justify-center bg-[#444444]">
+                <div
+                  className="absolute w-fit p-4 bottom-0 hover:bg-[#444444] transition-all active:scale-95 cursor-pointer duration-150 rounded-full right-0"
+                  onClick={() => handleScroll("down")}
+                >
+                  <TbArrowBackUp size={35} className="text-white" />
+                </div>
                 <div className="flex w-[100%] flex-col mt-[-20px] flex-wrap items-center  justify-center gap-2 gap-y-5">
                   <motion.div
                     initial={{ opacity: 0, y: -20, rotate: -10 }}
@@ -214,7 +226,7 @@ const Page = () => {
                     }}
                     className="relative w-[100%]"
                   >
-                    <div className="relative  flex items-center gap-[2px]  justify-center  ">
+                    <div className="relative  flex items-center gap-[2px]  justify-center">
                       <PopOverForPrefix />
                       <Input
                         ref={inputRef}
@@ -246,26 +258,45 @@ const Page = () => {
                 </div>
               </div>
               {/* Verification badge section */}
-              <div className="w-[100%] relative h-[100%] bg-[#363636]">
-                <div className="absolute w-fit p-2 top-0 left-0">
-                  <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{
-                      type: "spring",
-                      stiffness: 260,
-                      damping: 20,
-                      duration: 0.6,
-                    }}
+              <div className="w-[100%] flex flex-col  relative h-[100%] bg-[#363636]">
+                {/* Audio Carousel */}
+                <div className="w-[100%] h-[100%] flex-col flex-shrink-0   text-white  flex justify-evenly ">
+                  <div className="w-full h-[180px]  m-w-[350px]  flex items-center  justify-center">
+                    <AudioUploadCard />
+                  </div>
+                  <SelectAudioCarousel />
+                  <div
+                    className="relative flex items-center justify-end w-full   h-10 select-none   text-black "
+                    onClick={() => handleScroll("down")}
                   >
-                    <RiVerifiedBadgeFill size={25} className="text-green-600" />
-                  </motion.div>
+                    {/* <TbArrowBackUp size={35} className="text-white" /> */}
+                    <p className="font-semibold bg-white m-4 p-2 transition-all active:scale-90 cursor-pointer duration-150 rounded-sm  shadow-lg">
+                      Set Audio
+                    </p>
+                  </div>
+                </div>
+                <div
+                  className="absolute w-fit  p-2 py-1 top-0 hover:bg-[#444444] font-semibold transition-all active:scale-95 cursor-pointer duration-150 rounded-full right-0"
+                  onClick={() => handleScroll("up")}
+                >
+                  <TbArrowBackUp size={25} className="text-white" />
                 </div>
               </div>
-              <div className="w-[100%] h-[100%] bg-[#2c2c2c]"></div>
+              <div className="w-[100%] h-[100%] bg-[#2c2c2c] relative">
+                <div
+                  className="absolute w-fit p-4 top-0 hover:bg-[#444444] transition-all active:scale-95 cursor-pointer duration-150 rounded-full right-0"
+                  onClick={() => handleScroll("up")}
+                >
+                  <TbArrowBackUp size={35} className="text-white" />
+                </div>
+              </div>
             </div>
           </div>
         </section>
+      </div>
+    ) : (
+      <div className="w-full h-[100%] flex items-center justify-center">
+        <Skeleton className="w-[75%] relative  min-w-[300px] h-[80%] bg-[#646464]" />
       </div>
     );
   };
@@ -338,8 +369,8 @@ const Page = () => {
     <div className="w-full h-[calc(100svh)] ">
       <Header />
 
-      <section className="flex overflow-auto h-[calc(100svh-60px)] min-h-[350px]">
-        <div className="w-[100%] h-[100%] overflow-auto min-h-[350px]">
+      <section className="flex overflow-auto h-[calc(100svh-60px)] min-h-[500px]">
+        <div className="w-full h-[100%] overflow-auto min-h-[500px]">
           <Content />
         </div>
         {!isMobile ? <SideBar /> : null}

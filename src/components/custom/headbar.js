@@ -1,10 +1,9 @@
 "use client";
-import React, { useEffect } from "react";
-import { GoPerson } from "react-icons/go";
+import React from "react";
 import { Paytone_One } from "next/font/google";
 import Link from "next/link";
-import LoginPop from "./loginPop";
 import { useSession } from "next-auth/react";
+import LoginPop from "./loginPop";
 import SlideSideBar from "./slideSideBar";
 import { Poppins } from "next/font/google";
 const poppins = Poppins({
@@ -17,12 +16,8 @@ const paytoneOne = Paytone_One({
   subsets: ["latin"],
 });
 const Headbar = () => {
-  const { data: session } = useSession();
-  console.log(session);
+  const { data: session, status } = useSession();
 
-  useEffect(() => {
-    console.log(session);
-  }, [session]);
   return (
     <>
       <div

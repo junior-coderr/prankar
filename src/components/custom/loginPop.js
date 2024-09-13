@@ -6,7 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "../ui/dialog";
 import { GoPerson } from "react-icons/go";
 import { FcGoogle } from "react-icons/fc";
 import { signIn } from "next-auth/react";

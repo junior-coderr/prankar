@@ -4,7 +4,7 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTrigger,
-} from "@/components/ui/sheet";
+} from "../ui/sheet";
 
 import React from "react";
 

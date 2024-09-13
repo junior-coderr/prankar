@@ -5,16 +5,16 @@ const paytoneOne = Paytone_One({
   subsets: ["latin"],
 });
 
-import LetterPullup from "@/components/magicui/letter-pullup";
-import ShinyButton from "@/components/magicui/shiny-button";
+import LetterPullup from "../components/magicui/letter-pullup";
+import ShinyButton from "../components/magicui/shiny-button";
 import * as motion from "framer-motion/client";
-import { cn } from "@/lib/utils";
+import { cn } from "../lib/utils";
 
-import DemoContainer from "@/components/custom/DemoContainer";
-import DotPattern from "@/components/magicui/dot-pattern";
-import Headbar from "@/components/custom/headbar";
-import ShineBorder from "@/components/magicui/shine-border";
-import SmileRandom from "@/components/custom/SmileRandom";
+import DemoContainer from "../components/custom/DemoContainer";
+import DotPattern from "../components/magicui/dot-pattern";
+import Headbar from "../components/custom/headbar";
+import ShineBorder from "../components/magicui/shine-border";
+import SmileRandom from "../components/custom/SmileRandom";
 
 export default function Home() {
   async function HeadText() {
