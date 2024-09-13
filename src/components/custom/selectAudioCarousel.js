@@ -21,30 +21,42 @@ const SelectAudioCarousel = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(null);
   const [elemObj, setElemObj] = useState({});
-  // useEffect(() => {
-  //   console.log(elemObj);
-  // }, [elemObj]);
-  useEffect(() => {
-    console.log(currentIndex);
-  }, [currentIndex]);
+
   const dispatch = useDispatch();
   const playingAudio = useSelector((state) => state.playingAudio.value);
+
   const tempUrl =
     "https://webnew.blob.core.windows.net/audio/keyboard-typing-5997.mp3";
-  const handleAudioClick = (index) => {
+
+  const handleAudioClick = async (index) => {
+    if (isLoading) return;
+    setIsLoading(true);
     if (playingAudio) {
       playingAudio.stop();
-      setElemObj((prev) => ({
-        ...prev,
-        [currentIndex]: {
-          ...prev[currentIndex],
-          isPlaying: false,
-        },
-      }));
+      await playingAudio.unload();
+      dispatch(setPlayingAudio(null));
+      dispatch(setAudioSelected(null));
+    }
+    setElemObj((prev) => ({
+      ...prev,
+      [currentIndex]: {
+        ...prev[currentIndex],
+        isPlaying: false,
+        isLoading: false,
+      },
+    }));
+
+    if (index == currentIndex) {
+      dispatch(setAudioSelected(null));
+      dispatch(setPlayingAudio(null));
+      setIsLoading(false);
+      setCurrentIndex(null);
+      return;
     }
 
-    if (elemObj[index]?.isLoading) return;
+    // if (playingAudio != null) return;
     dispatch(setAudioSelected(index));
+    setIsLoading(true);
     setElemObj((prev) => ({
       ...prev,
       [index]: {
@@ -75,13 +87,16 @@ const SelectAudioCarousel = () => {
         }));
       },
       onload: () => {
+        setIsLoading(false);
         setElemObj((prev) => ({
           ...prev,
           [index]: {
             ...prev[index],
             isLoading: false,
+            isPlaying: true,
           },
         }));
+        setIsLoading(false);
       },
       onpause: () => {
         setElemObj((prev) => ({
@@ -91,8 +106,11 @@ const SelectAudioCarousel = () => {
             isPlaying: false,
           },
         }));
+        setIsLoading(false);
       },
     });
+    setCurrentIndex(index);
+    dispatch(setAudioSelected(index));
     dispatch(setPlayingAudio(sound));
     sound.play();
   };
@@ -101,7 +119,7 @@ const SelectAudioCarousel = () => {
       <CarouselContent className=" h-full">
         {/* h-[calc(55vh)] */}
         <CarouselItem
-          className="flex-shrink-0 w-full font-semibold h-[100%] mx-auto grid-cols-2 sm:grid-cols-3 gap-y-5 px-5 overflow-y-auto place-items-center "
+          className="flex-shrink-0 w-full font-medium h-[100%] mx-auto grid-cols-2 sm:grid-cols-3 gap-y-5 px-5 overflow-y-auto place-items-center "
           style={{
             display: "grid",
             // gridTemplateColumns: " repeat(2, 1fr)",
@@ -126,7 +144,6 @@ const SelectAudioCarousel = () => {
                   elemObj[index]?.isPlaying ? "border-4 border-[#25b09b]" : ""
                 }`}
                 onClick={() => {
-                  setCurrentIndex(index);
                   handleAudioClick(index);
                 }}
                 disabled={elemObj[index]?.isLoading}

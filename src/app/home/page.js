@@ -16,6 +16,8 @@ import { IoIosArrowDropdownCircle } from "react-icons/io";
 import { TbArrowBackUp } from "react-icons/tb";
 import SelectAudioCarousel from "../../components/custom/selectAudioCarousel";
 import AudioUploadCard from "../../components/custom/audioUploadCard";
+import { setPlayingAudio } from "../../app/redux/slices/playingAudio";
+import { clearAudioSelected } from "../../app/redux/slices/audioSelected";
 import {
   Popover,
   PopoverContent,
@@ -100,6 +102,11 @@ const Page = () => {
     const [currentScroll, setCurrentScroll] = useState(0);
     const currentScrollRef = useRef(0);
     const [isActive, setIsActive] = useState(false);
+    const audioSelected = useSelector(
+      (state) => state.audioSelected.audioSelected
+    );
+
+    const playingAudio = useSelector((state) => state.playingAudio.value);
 
     const dispatch = useDispatch();
     const prefix = useSelector((state) => state.phoneNoInput.prefix);
@@ -265,14 +272,35 @@ const Page = () => {
                     <AudioUploadCard />
                   </div>
                   <SelectAudioCarousel />
-                  <div
-                    className="relative flex items-center justify-end w-full   h-10 select-none   text-black "
-                    onClick={() => handleScroll("down")}
-                  >
+                  <div className="relative flex items-center justify-end w-full   h-10 select-none   text-black ">
                     {/* <TbArrowBackUp size={35} className="text-white" /> */}
-                    <p className="font-semibold bg-white m-4 p-2 transition-all active:scale-90 cursor-pointer duration-150 rounded-sm  shadow-lg">
+                    <button
+                      className={`font-semibold bg-white m-4 p-3 transition-all active:scale-90 cursor-pointer duration-150 rounded-sm  shadow-lg ${
+                        audioSelected == null
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                      }`}
+                      onClick={() => {
+                        if (audioSelected) {
+                          playingAudio.stop();
+                          playingAudio.unload();
+                          dispatch(setPlayingAudio(null));
+                          // dispatch(clearAudioSelected());
+                          handleScroll("down");
+                        }
+                      }}
+                      disabled={audioSelected == null}
+                      // onClick={() => {
+                      //   if (audioSelected) {
+                      //     playingAudio.stop();
+                      //     playingAudio.unload();
+                      //     dispatch(setPlayingAudio(null));
+                      //     dispatch(setAudioSelected(null));
+                      //   }
+                      // }}
+                    >
                       Set Audio
-                    </p>
+                    </button>
                   </div>
                 </div>
                 <div
