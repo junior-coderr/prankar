@@ -1,6 +1,8 @@
 import dotenv from "dotenv";
 dotenv.config();
 import GoogleProvider from "next-auth/providers/google";
+import connect from "../../../utils/mongodb/connect";
+import User from "app/utils/MongoSchema/user";
 
 const Options = {
   providers: [
@@ -11,11 +13,25 @@ const Options = {
   ],
   callbacks: {
     async signIn(user, account, profile) {
-      console.log(user);
-      return true;
+      try {
+        await connect();
+        const userExists = await User.findOne({ email: user.user.email });
+        if (!userExists) {
+          const newUser = new User({
+            email: user.user.email,
+            name: user.user.name,
+            image: user.user.image,
+          });
+          await newUser.save();
+          console.log("User created ");
+        }
+        return true;
+      } catch (error) {
+        console.error("Error connecting to MongoDB:", error);
+        return null;
+      }
     },
     async redirect({ url, baseUrl }) {
-      // redirecting on /dashboard page after login
       return baseUrl + "/home";
     },
   },

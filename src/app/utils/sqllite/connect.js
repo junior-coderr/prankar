@@ -24,4 +24,27 @@ async function createTable() {
   });
 }
 
+async function connectToDatabase2() {
+  const db = await open({
+    filename: "./database_userPay.sqlite",
+    driver: sqlite3.Database,
+  });
+  return db;
+}
+
+async function createUserTable() {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const db = await connectToDatabase2();
+      await db.exec(
+        "CREATE TABLE IF NOT EXISTS paymentStatus (email TEXT PRIMARY KEY, status TEXT)"
+      );
+      resolve(db);
+    } catch (error) {
+      console.error("Failed to create table", error);
+      reject(error);
+    }
+  });
+}
+export { createUserTable };
 export default createTable;

@@ -5,6 +5,7 @@ import audioSelectedReducer from "./slices/audioSelected";
 import playingAudioReducer from "./slices/playingAudio";
 import sidReducer from "./slices/sid";
 import externalAudioUnloadReducer from "./slices/ExternalAudioUnload";
+import transaction from "./slices/transaction.payment";
 export const store = configureStore({
   reducer: {
     phoneNoInput: phoneNoInputReducer,
@@ -13,5 +14,6 @@ export const store = configureStore({
     playingAudio: playingAudioReducer,
     sid: sidReducer,
     externalAudioUnload: externalAudioUnloadReducer,
+    transaction: transaction,
   },
 });

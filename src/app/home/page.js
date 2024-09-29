@@ -26,6 +26,9 @@ import Loader3 from "../../components/custom/loader3";
 import toast from "react-hot-toast";
 import RecordAudioPlayer from "../../components/custom/RecordAudioPlayer";
 import { setExternalAudioUnload } from "app/redux/slices/ExternalAudioUnload";
+import getCredits from "app/utils/client/getCredits";
+// import { IoAddCircle } from "react-icons/io5";
+import { FaArrowRight } from "react-icons/fa6";
 
 import { Poppins } from "next/font/google";
 const poppins = Poppins({
@@ -33,12 +36,16 @@ const poppins = Poppins({
   subsets: ["latin"],
 });
 import { VscDebugRestart } from "react-icons/vsc";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 // Main Page Component
 const Page = () => {
   const [isMobile, setIsMobile] = useState(null);
+  const [credits, setCredits] = useState(0);
 
-  const [isImgLoading, setIsImgLoading] = useState(true);
+  const [isImgLoading, setIsImgLoading] = useState(false);
   const prefixLengths = {
     "+91": 10, // India with prefix and space
     "+1": 7, // USA
@@ -58,6 +65,23 @@ const Page = () => {
   }, []);
 
   const { data: session } = useSession();
+
+  async function creditsCall(email) {
+    if (!email) return;
+    console.log("emaildwefw", email);
+    const credits = await getCredits(email);
+    console.log("crredits", credits);
+    setCredits(credits);
+    console.log("credits", credits);
+  }
+
+  useEffect(() => {
+    creditsCall(session?.user?.email);
+  }, [session]);
+
+  useEffect(() => {
+    console.log("session", session);
+  }, [session]);
 
   function PopOverForPrefix() {
     const prefixData = useSelector((state) => state.phoneNoInput.prefix);
@@ -109,7 +133,7 @@ const Page = () => {
     const audioSelected = useSelector(
       (state) => state.audioSelected.audioSelected
     );
-    const sid = useSelector((state) => state.sid.value);
+    // const sid = useSelector((state) => state.sid.value);
     const [isLoading, setIsLoading] = useState(false);
     const audioFile = useSelector((state) => state.audioFile.audioFile);
 
@@ -123,6 +147,9 @@ const Page = () => {
     const dispatch = useDispatch();
     const prefix = useSelector((state) => state.phoneNoInput.prefix);
     const phoneNo = useSelector((state) => state.phoneNoInput.value);
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams(); // Get the query parameters
 
     // Handler for phone number input change
     const handlePhoneNoChange = (e) => {
@@ -218,12 +245,17 @@ const Page = () => {
 
     // Handler for continue button
     const handleContinue = () => {
+      if (!phoneNo.includes(prefix)) {
+        toast.error("Please enter prefix code");
+        return;
+      }
       if (
         phoneNo.replace(/\s/g, "").slice(prefix.length).length >= 6 &&
         phoneNo.replace(/\s/g, "").slice(prefix.length).length <=
           // prefixLengths[prefix]
           12
       ) {
+        // toast.success(phoneNo);
         handleScroll("down");
         const resizeObserver = new ResizeObserver((entries) => {
           for (let entry of entries) {
@@ -248,8 +280,25 @@ const Page = () => {
           }
         };
       } else {
+        toast.error("Please enter a valid phone number");
       }
     };
+    // Function to get URL parameter
+    const getUrlParameter = (name) => {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(name);
+    };
+
+    useEffect(() => {
+      const cid = searchParams.get("cid");
+      console.log("cid", cid);
+      if (cid) {
+        console.log("cid", cid);
+        serverSEvent(cid);
+        handleScroll("down");
+        handleScroll("down");
+      }
+    }, []);
 
     const serverSEvent = async (sid) => {
       console.log("sid", sid);
@@ -330,9 +379,6 @@ const Page = () => {
       setIsLoading(true);
 
       if (audioSelected != null || audioFile != null) {
-        // playingAudio?.stop();
-        // playingAudio?.unload();
-        // if (playingAudio) dispatch(setPlayingAudio(null));
         const formData = new FormData();
         formData.append("audioFile", audioFile);
         formData.append("phoneNo", phoneNo);
@@ -367,7 +413,13 @@ const Page = () => {
             }
 
             console.log("sid", data.twilioCall.callSid);
-            dispatch(setSid(data.twilioCall.callSid));
+            window.history.replaceState(
+              null,
+              "",
+              `/home/?cid=${data.twilioCall.callSid}`
+            );
+
+            // router.replace(`home/?cid=${data.twilioCall.callSid}`);
             serverSEvent(data.twilioCall.callSid);
             console.log("Audio selected uploaded successfully:", data);
             toast.success("Audio uploaded successfully", {
@@ -404,6 +456,12 @@ const Page = () => {
             }
 
             dispatch(setSid(data.callResponse.callSid));
+            window.history.replaceState(
+              null,
+              "",
+              `/home/?cid=${data.callResponse.callSid}`
+            );
+
             serverSEvent(data.callResponse.callSid);
             console.log("Audio file uploaded successfully:", data);
             toast.success("Audio uploaded successfully", {
@@ -431,7 +489,7 @@ const Page = () => {
     }, [statusColor]);
 
     // JSX for Content component
-    return isMobile != null ? (
+    return (
       <div className={`${poppins.className} w-full h-[100%] `}>
         <section className="flex overflow-auto">
           <div className="w-full h-[calc(100svh-60px)] min-h-[500px] overflow-auto  flex items-center justify-center">
@@ -441,14 +499,14 @@ const Page = () => {
                 currentScrollRef.current + 1 == 3 ? "inp_container_status" : ""
               } w-[75%] relative  min-w-[300px] inp_containe  overflow-hidden mx-auto h-[80%] bg-[#3f3f3f] rounded-md shadow-xl  border-[5px] border-[#444444]`}
             >
-              {/* Phone number input section */}
+              {/* Phone number input section 1*/}
               <div className="w-[100%] h-[100%] relative flex flex-col items-center justify-center bg-[#444444]">
-                <div
+                {/* <div
                   className="absolute w-fit p-4 bottom-0 hover:bg-[#444444] transition-all active:scale-95 cursor-pointer duration-150 rounded-full right-0"
                   onClick={() => handleScroll("down")}
                 >
                   <TbArrowBackUp size={35} className="text-white" />
-                </div>
+                </div> */}
                 <div className="flex w-[100%] flex-col mt-[-20px] flex-wrap items-center  justify-center gap-2 gap-y-5">
                   <motion.div
                     initial={{ opacity: 0, y: -20, rotate: -10 }}
@@ -492,7 +550,7 @@ const Page = () => {
                   </motion.div>
                 </div>
               </div>
-              {/* Verification badge section */}
+              {/* Verification badge section 2*/}
               <div className="w-[100%] flex flex-col  relative h-[100%] bg-[#363636]">
                 {/* Audio Carousel */}
                 <div className="w-[100%] h-[100%] flex-col flex-shrink-0   text-white  flex justify-evenly ">
@@ -523,7 +581,7 @@ const Page = () => {
                   <TbArrowBackUp size={25} className="text-white" />
                 </div>
               </div>
-              {/* Status section */}
+              {/* Status section 3 */}
               <div className="w-[100%] h-[100%] bg-[#2c2c2c] relative">
                 <div className="w-[100%] h-[100%] bg-[#2c2c2c] relative">
                   <div className="w-[100%] h-[100%] flex items-center justify-center">
@@ -536,7 +594,7 @@ const Page = () => {
                           <span className="hidden">
                             {setTimeout(() => {
                               perfectScroll();
-                            }, 1000)}
+                            }, 1000) && null}
                           </span>
                         </>
                       ) : (
@@ -546,7 +604,7 @@ const Page = () => {
                           <span className="hidden">
                             {setTimeout(() => {
                               perfectScroll();
-                            }, 1000)}
+                            }, 1000) && null}
                           </span>
                         </span>
                       )}
@@ -565,7 +623,7 @@ const Page = () => {
                           <span className="hidden">
                             {setTimeout(() => {
                               perfectScroll();
-                            }, 1000)}
+                            }, 1000) && null}
                           </span>
                         </>
                       )}
@@ -577,10 +635,10 @@ const Page = () => {
           </div>
         </section>
       </div>
-    ) : (
-      <div className="w-full h-[100%] flex items-center justify-center">
-        <Skeleton className="w-[75%] relative  min-w-[300px] h-[80%] bg-[#646464]" />
-      </div>
+      // ) : (
+      //   <div className="w-full h-[100%] flex items-center justify-center">
+      //     <Skeleton className="w-[75%] relative  min-w-[300px] h-[80%] bg-[#646464]" />
+      //   </div>
     );
   };
 
@@ -613,11 +671,16 @@ const Page = () => {
         {/* User info section */}
         <div className=" mt-4">
           {session ? (
-            <div className="text-center flex flex-col items-start bg-[#3f3f3f] p-2 rounded-md mx-auto w-[90%] border-[2px] border-[#444444]">
-              <p className="text-white truncate w-full">{session.user.email}</p>
-              <p className="text-white mt-2">
-                Credits left: {session.user.credits || 0}
+            <div className="text-center flex flex-col items-start bg-[#3f3f3f] p-2 rounded-md mx-auto w-[90%] border-[2px] border-[#444444] text-white ">
+              <p className="text-white truncate w-full flex items-start">
+                {session.user.email}
               </p>
+              <p className="text-white my-2">
+                Credits left: {credits ? credits : "..."}
+              </p>
+              <Link href={"/payment"} className="flex  gap-2  items-center">
+                Credits <FaArrowRight className="text-green-600 text-[18px]" />
+              </Link>
             </div>
           ) : (
             <>
@@ -657,6 +720,7 @@ const Page = () => {
           <Content />
         </div>
         {!isMobile ? <SideBar /> : null}
+        {/* {<SideBar />} */}
       </section>
     </div>
   );

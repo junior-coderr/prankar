@@ -19,7 +19,17 @@ export async function GET(request) {
             "SELECT * FROM callStatus WHERE sid = ?",
             sid.toString()
           );
-          console.log("dbData", dbData);
+
+          if (!dbData) {
+            console.log("No data found");
+            if (controller) {
+              controller.close();
+              clearInterval(interval);
+              console.log("Interval cleared");
+            }
+            return;
+          }
+
           const data = JSON.stringify({
             message: `Call status updated for id: ${sid}`,
             Data: dbData,

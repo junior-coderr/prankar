@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { Paytone_One } from "next/font/google";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
@@ -17,6 +17,10 @@ const paytoneOne = Paytone_One({
 });
 const Headbar = () => {
   const { data: session, status } = useSession();
+
+  useEffect(() => {
+    console.log("session", session);
+  }, [session]);
 
   return (
     <>
@@ -38,6 +42,7 @@ const Headbar = () => {
               <SlideSideBar content={session} />
             ) : (
               "Ahoy, " + session.user.name.split(" ")[0]
+              // <></>
             )
           ) : (
             <LoginPop />

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import customAudioUpload from "../../utils/custom-audio-upload";
 import connect from "../../utils/mongodb/connect";
+import { preloadedaudio } from "../../utils/MongoSchema/user";
+
 import callTwilio from "../../utils/twilio/call-twilio";
 let audioArr = null;
 
@@ -8,12 +10,10 @@ async function getAudioFromDB() {
   try {
     await new Promise(async (resolve, reject) => {
       try {
-        const client = await connect();
-        const db = client.db("prankar");
-        const audioCollection = db.collection("preloadedaudio");
-        let audio = await audioCollection.find({}).toArray();
-        audioArr = audio.map((doc) => doc.audios);
-        // console.log("audioArr", audioArr);
+        await connect();
+        let audio = await preloadedaudio.find({});
+        audioArr = audio[0].audios;
+        console.log("audio in default sendiiii", audioArr);
         resolve();
       } catch (error) {
         console.error("Error getting audio from DB:", error);
@@ -44,7 +44,7 @@ async function audioSelectedUpload(request) {
     }
 
     if (audioArr != null) {
-      audioArr = audioArr.flat();
+      // audioArr = audioArr.flat();
       const selectedAudio = audioArr[selectedAudioIndex];
       console.log("selectedAudio", selectedAudio);
 
