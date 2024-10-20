@@ -122,7 +122,7 @@ const Payment = () => {
       setIsLoading(false);
     }, []);
 
-    return session && session.user ? (
+    return session && session?.user ? (
       <PayPalScriptProvider className="" options={initialOptions}>
         {isLoading ? (
           <Loader3 />

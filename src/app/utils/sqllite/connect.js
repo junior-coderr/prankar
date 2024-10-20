@@ -14,7 +14,7 @@ async function createTable() {
     try {
       const db = await connectToDatabase();
       await db.exec(
-        "CREATE TABLE IF NOT EXISTS callStatus (sid TEXT PRIMARY KEY, status TEXT, recordingUrl TEXT)"
+        "CREATE TABLE IF NOT EXISTS callStatus (sid TEXT PRIMARY KEY, status TEXT, recordingUrl TEXT, createdAt TEXT DEFAULT CURRENT_TIMESTAMP)"
       );
       resolve(db);
     } catch (error) {

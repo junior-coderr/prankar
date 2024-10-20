@@ -41,7 +41,8 @@ const Headbar = () => {
             window.innerWidth < 768 ? (
               <SlideSideBar content={session} />
             ) : (
-              "Ahoy, " + session.user.name.split(" ")[0]
+              // ""
+              "Ahoy, " + session?.user?.name?.split(" ")[0]
               // <></>
             )
           ) : (

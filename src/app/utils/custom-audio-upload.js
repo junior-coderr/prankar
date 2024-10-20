@@ -7,7 +7,8 @@ const authToken = process.env.TWILIO_AUTH_TOKEN;
 export default async function customAudioUpload(
   request = null,
   type = "general",
-  url = null
+  url = null,
+  email = null
 ) {
   return new Promise(async (resolve, reject) => {
     try {
@@ -87,7 +88,9 @@ export default async function customAudioUpload(
       }
 
       // Use either the provided audioFile name or generate a unique name for "flex"
-      const blobName = audioFile ? audioFile.name : `flex-audio-${Date.now()}`;
+      const blobName = `flex-audio-${Date.now()}`;
+      // const blobName = "audio_user_uploaded.mp3";
+      //significant change
       const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
       // Upload the audio buffer to Azure Blob
@@ -105,7 +108,7 @@ export default async function customAudioUpload(
       let callResponse;
 
       if (type === "general") {
-        callResponse = await callTwilio(audioFileUrl, phoneNo); // Pass the audio file URL to Twilio
+        callResponse = await callTwilio(audioFileUrl, phoneNo, email); // Pass the audio file URL to Twilio
       }
 
       console.log("Call Response:", callResponse);

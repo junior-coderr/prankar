@@ -5,7 +5,7 @@ const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const client = twilio(accountSid, authToken);
 
-async function makeCall(audioFileUrl, toPhoneNumber = "+9175175505361") {
+async function makeCall(audioFileUrl, toPhoneNumber = "+9175175505361", email) {
   return new Promise((resolve, reject) => {
     client.calls
       .create({
@@ -13,9 +13,9 @@ async function makeCall(audioFileUrl, toPhoneNumber = "+9175175505361") {
         to: toPhoneNumber, // Recipient's phone number
         from: process.env.TWILIO_PHONE_NUMBER, // Your Twilio phone number
         record: true, // Enable recording
-        statusCallback: `${process.env.NEXT_PUBLIC_BASE_URL}/api/twilio/call-status`,
+        statusCallback: `${process.env.NEXT_PUBLIC_BASE_URL}/api/twilio/call-status?email=${email}`,
         statusCallbackEvent: ["initiated", "ringing", "answered", "completed"],
-        recordingStatusCallback: `${process.env.NEXT_PUBLIC_BASE_URL}/api/twilio/recording`,
+        recordingStatusCallback: `${process.env.NEXT_PUBLIC_BASE_URL}/api/twilio/recording?email=${email}`,
       })
       .then((call) => {
         resolve({ message: "Call initiated", callSid: call.sid });

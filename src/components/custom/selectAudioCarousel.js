@@ -148,7 +148,7 @@ const SelectAudioCarousel = () => {
             gridAutoColumns: "1fr",
           }}
         >
-          {audioData.length > 0 ? (
+          {audioData?.length > 0 ? (
             audioData.map((audio, index) => {
               // Initialize the element object only once
               if (!(index in elemObj)) {
@@ -192,8 +192,8 @@ const SelectAudioCarousel = () => {
             </div>
           )}
         </CarouselItem>
-        <CarouselItem className="flex-shrink-0 w-full">Audio 2</CarouselItem>
-        <CarouselItem className="flex-shrink-0 w-full">Audio 3</CarouselItem>
+        {/* <CarouselItem className="flex-shrink-0 w-full">Audio 2</CarouselItem> */}
+        {/* <CarouselItem className="flex-shrink-0 w-full">Audio 3</CarouselItem> */}
       </CarouselContent>
       <CarouselPrevious className="left-3  cursor-pointer text-black active:scale-90 duration-150" />
       <CarouselNext className="right-3  cursor-pointer text-black active:scale-90 duration-150" />

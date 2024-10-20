@@ -27,7 +27,6 @@ import toast from "react-hot-toast";
 import RecordAudioPlayer from "../../components/custom/RecordAudioPlayer";
 import { setExternalAudioUnload } from "app/redux/slices/ExternalAudioUnload";
 import getCredits from "app/utils/client/getCredits";
-// import { IoAddCircle } from "react-icons/io5";
 import { FaArrowRight } from "react-icons/fa6";
 
 import { Poppins } from "next/font/google";
@@ -43,7 +42,8 @@ import { usePathname, useSearchParams } from "next/navigation";
 // Main Page Component
 const Page = () => {
   const [isMobile, setIsMobile] = useState(null);
-  const [credits, setCredits] = useState(0);
+  // const [credits, setCredits] = useState(0);
+  const creditRef = useRef();
 
   const [isImgLoading, setIsImgLoading] = useState(false);
   const prefixLengths = {
@@ -68,11 +68,13 @@ const Page = () => {
 
   async function creditsCall(email) {
     if (!email) return;
-    console.log("emaildwefw", email);
-    const credits = await getCredits(email);
-    console.log("crredits", credits);
-    setCredits(credits);
-    console.log("credits", credits);
+    // console.log("emaildwefw", email);
+    const c = await getCredits(email);
+    // console.log("crredits", credits);
+    // setCredits(credits);
+    console.log("dom", creditRef.current);
+    if (creditRef.current) creditRef.current.textContent = c;
+    // console.log("credits", credits);
   }
 
   useEffect(() => {
@@ -245,6 +247,18 @@ const Page = () => {
 
     // Handler for continue button
     const handleContinue = () => {
+      if (!session) {
+        toast.error("Please login first!");
+        return;
+      }
+      console.log("sssss", creditRef.current.textContent);
+      if (creditRef.current.textContent == 0) {
+        toast.error("Don't have enough credits!");
+        setTimeout(() => {
+          router.push("payment");
+        }, 3000);
+        return;
+      }
       if (!phoneNo.includes(prefix)) {
         toast.error("Please enter prefix code");
         return;
@@ -320,6 +334,8 @@ const Page = () => {
 
         if (data?.Data?.status == "completed" && data?.Data?.recordingUrl) {
           setRecUrl(data?.Data?.recordingUrl);
+          creditsCall(session?.user?.email);
+
           setIsRestart(true);
         }
         // console.log("recUrl", recUrl);
@@ -382,6 +398,14 @@ const Page = () => {
         const formData = new FormData();
         formData.append("audioFile", audioFile);
         formData.append("phoneNo", phoneNo);
+
+        // Check file size if audioFile is present
+        if (audioFile && audioFile.size > 25 * 1024 * 1024) {
+          toast.error("File size exceeds 25 MB limit");
+          setIsLoading(false);
+          return;
+        }
+
         try {
           if (audioSelected != null) {
             // Handle audio selected case
@@ -394,7 +418,6 @@ const Page = () => {
             });
 
             if (!response.ok) {
-              throw new Error("Network response was not ok");
               toast.error("Sorry, something went wrong");
               return;
             }
@@ -576,7 +599,10 @@ const Page = () => {
 
                 <div
                   className="absolute w-fit  p-2 py-1 top-0 hover:bg-[#444444] font-semibold transition-all active:scale-95 cursor-pointer duration-150 rounded-full right-0"
-                  onClick={() => handleScroll("up")}
+                  onClick={() => {
+                    handleScroll("up");
+                    handleScroll("up");
+                  }}
                 >
                   <TbArrowBackUp size={25} className="text-white" />
                 </div>
@@ -616,6 +642,7 @@ const Page = () => {
                               setIsRestart(false);
                               setStatus("Calling");
                               setStatusColor("#b1b1b1");
+                              window.history.replaceState(null, "", `/home`);
                             }}
                             size={25}
                             className="opacity-70 mt-5 cursor-pointer hover:opacity-100 active:scale-90 transition-all duration-150"
@@ -655,11 +682,11 @@ const Page = () => {
       >
         {/* User profile image */}
         <div className="w-[100px] h-[100px] rounded-full overflow-hidden mx-auto mt-10 border-[5px] border-[#3f3f3f]">
-          {session && isImgLoading && session.user.image ? (
+          {session && isImgLoading && session?.user?.image ? (
             <Skeleton className="w-full h-full bg-[#444444] shadow-md" />
           ) : (
             <Image
-              src={session?.user.image}
+              src={session?.user?.image}
               alt=" "
               width={100}
               height={100}
@@ -673,10 +700,11 @@ const Page = () => {
           {session ? (
             <div className="text-center flex flex-col items-start bg-[#3f3f3f] p-2 rounded-md mx-auto w-[90%] border-[2px] border-[#444444] text-white ">
               <p className="text-white truncate w-full flex items-start">
-                {session.user.email}
+                {session?.user.email}
               </p>
               <p className="text-white my-2">
-                Credits left: {credits ? credits : "..."}
+                {/* Credits left: {credits ? credits : "..."} */}
+                Credits left: <span ref={creditRef}></span>
               </p>
               <Link href={"/payment"} className="flex  gap-2  items-center">
                 Credits <FaArrowRight className="text-green-600 text-[18px]" />
@@ -712,7 +740,7 @@ const Page = () => {
 
   // Main component return
   return (
-    <div className="w-full h-[calc(100svh)] ">
+    <div className="w-full h-[calc(100svh)]">
       <Header />
 
       <section className="flex overflow-auto h-[calc(100svh-60px)] min-h-[500px]">

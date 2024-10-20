@@ -1,15 +1,17 @@
 import { NextResponse } from "next/server";
-import twilio from "twilio";
+// import twilio from "twilio";
 import createTable from "../../../utils/sqllite/connect";
 
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const authToken = process.env.TWILIO_AUTH_TOKEN;
-const twilioClient = twilio(accountSid, authToken);
+// const accountSid = process.env.TWILIO_ACCOUNT_SID;
+// const authToken = process.env.TWILIO_AUTH_TOKEN;
+// const twilioClient = twilio(accountSid, authToken);
 
 async function handler(req) {
   try {
     const text = await req.text(); // Get the raw text from the request
     const params = new URLSearchParams(text); // Parse the text as form data
+
+    // console.log("Email: from check status", email);
 
     // Convert form data to an object
     const body = Object.fromEntries(params);
