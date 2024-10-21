@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect } from "react";
-import { Paytone_One } from "next/font/google";
+// import { Paytone_One } from "next/font/google";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import LoginPop from "./loginPop";
@@ -10,11 +10,11 @@ const poppins = Poppins({
   weight: ["400", "700"],
   subsets: ["latin"],
 });
-const paytoneOne = Paytone_One({
-  weight: "400",
-  variable: "--wght@400",
-  subsets: ["latin"],
-});
+// const paytoneOne = Paytone_One({
+//   weight: "400",
+//   variable: "--wght@400",
+//   subsets: ["latin"],
+// });
 const Headbar = () => {
   const { data: session, status } = useSession();
 
@@ -29,7 +29,8 @@ const Headbar = () => {
       >
         <Link
           href="/"
-          className={`${paytoneOne.className} text-xl md:text-2xl font-[400] `}
+          // `${paytoneOne.className}
+          className={` text-xl md:text-2xl font-[400] `}
         >
           PRANKAR
         </Link>

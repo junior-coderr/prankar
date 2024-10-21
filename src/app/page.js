@@ -1,9 +1,9 @@
 import { Paytone_One } from "next/font/google";
-const paytoneOne = Paytone_One({
-  weight: "400",
-  variable: "--wght@400",
-  subsets: ["latin"],
-});
+// const paytoneOne = Paytone_One({
+//   weight: "400",
+//   variable: "--wght@400",
+//   subsets: ["latin"],
+// });
 
 import LetterPullup from "../components/magicui/letter-pullup";
 import ShinyButton from "../components/magicui/shiny-button";
@@ -94,7 +94,8 @@ export default function Home() {
         <SmileRandom />
         {/* Main content section */}
         <section
-          className={`${paytoneOne.className}
+          // ${paytoneOne.className}
+          className={`
         flex flex-col items-center
         w-full h-full
         justify-center
