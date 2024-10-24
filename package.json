@@ -45,6 +45,7 @@
     "sass": "^1.80.3",
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7",
+    "styled-components": "^6.1.13",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
     "twilio": "^5.3.0"

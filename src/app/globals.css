@@ -109,7 +109,6 @@
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.139), 0 0 100px #6b6b6b;
 }
 
-/* HTML: <div class="loader"></div> */
 .loader {
   width: 50px;
   aspect-ratio: 1;
@@ -151,7 +150,6 @@
   width: 68px;
   height: 68px;
   border-radius: 50%;
-  /* background: #d91656; */
   position: absolute;
   left: 0;
   top: 0;
@@ -177,7 +175,6 @@
   width: 25px;
   height: 25px;
   border: 5px solid #25b09b;
-  /* border-top: 5px solid #25b09b; */
   border-bottom-color: transparent;
   border-radius: 50%;
   display: inline-block;
@@ -192,4 +189,8 @@
   100% {
     transform: rotate(360deg);
   }
+}
+
+.paytoneOne {
+  font-family: "Paytone One", sans-serif;
 }

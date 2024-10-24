@@ -251,8 +251,8 @@ const Page = () => {
         toast.error("Please login first!");
         return;
       }
-      console.log("sssss", creditRef.current.textContent);
-      if (creditRef.current.textContent == 0) {
+      // console.log("sssss", creditRef.current.textContent);
+      if (creditRef.current?.textContent == 0) {
         toast.error("Don't have enough credits!");
         setTimeout(() => {
           router.push("payment");
