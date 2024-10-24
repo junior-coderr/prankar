@@ -1,10 +1,3 @@
-import { Paytone_One } from "next/font/google";
-// const paytoneOne = Paytone_One({
-//   weight: "400",
-//   variable: "--wght@400",
-//   subsets: ["latin"],
-// });
-
 import LetterPullup from "../components/magicui/letter-pullup";
 import ShinyButton from "../components/magicui/shiny-button";
 import * as motion from "framer-motion/client";
@@ -86,6 +79,7 @@ export default function Home() {
           transition={{
             delay: 0.2,
           }}
+          className="relative z-50"
         >
           {/* Header component */}
           <Headbar />
@@ -96,6 +90,7 @@ export default function Home() {
         <section
           // ${paytoneOne.className}
           className={`
+            paytoneOne
         flex flex-col items-center
         w-full h-full
         justify-center
