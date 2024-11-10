@@ -318,7 +318,7 @@ const Page = () => {
       console.log("sid", sid);
       let setStarted = false;
       const eventSource = new EventSource(
-        `https://uniika.in/api/call-status-check?sid=${sid}`
+        `http://localhost:3000/api/call-status-check?sid=${sid}`
       );
 
       eventSource.onopen = () => {
