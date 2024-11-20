@@ -1,7 +1,6 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Header from "../../components/custom/headbar";
-import { useState, useEffect, useRef } from "react";
 import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
 import { Skeleton } from "../../components/ui/skeleton";
@@ -27,7 +26,9 @@ import toast from "react-hot-toast";
 import RecordAudioPlayer from "../../components/custom/RecordAudioPlayer";
 import { setExternalAudioUnload } from "app/redux/slices/ExternalAudioUnload";
 import getCredits from "app/utils/client/getCredits";
+import TermsAndConditions from "app/utils/client/termsAndComditions";
 import { FaArrowRight } from "react-icons/fa6";
+import TermsACPopup from "../../components/custom/termsAC";
 
 import { Poppins } from "next/font/google";
 const poppins = Poppins({
@@ -42,14 +43,25 @@ import { usePathname, useSearchParams } from "next/navigation";
 // Main Page Component
 const Page = () => {
   const [isMobile, setIsMobile] = useState(null);
-  // const [credits, setCredits] = useState(0);
+  const [credits, setCredits] = useState(null); // Add this state to store credits
   const creditRef = useRef();
+  const [checkTAS, setCheckTAS] = useState(false);
+  const [showTACPopup, setShowTACPopup] = useState(false);
+  const [tacLoading, setTacLoading] = useState(false);
+  const [creditsLoaded, setCreditsLoaded] = useState(false);
 
   const [isImgLoading, setIsImgLoading] = useState(false);
   const prefixLengths = {
     "+91": 10, // India with prefix and space
     "+1": 7, // USA
     "+44": 10, // UK
+    "+55": 11, // Brazil
+    "+86": 11, // China
+    "+81": 11, // Japan
+    "+82": 11, // South Korea
+    "+27": 9, // South Africa
+    "+61": 9, // Australia
+    "+64": 9, // New Zealand
     // Add more country codes and their respective phone number lengths as needed
   };
 
@@ -66,29 +78,68 @@ const Page = () => {
 
   const { data: session } = useSession();
 
+  // Modify creditsCall function
   async function creditsCall(email) {
-    if (!email) return;
-    // console.log("emaildwefw", email);
-    const c = await getCredits(email);
-    // console.log("crredits", credits);
-    // setCredits(credits);
-    console.log("dom", creditRef.current);
-    if (creditRef.current) creditRef.current.textContent = c;
-    // console.log("credits", credits);
+    try {
+      const c = await getCredits(email);
+      if (creditRef.current) {
+        creditRef.current.textContent = c;
+      }
+    } catch (error) {
+      console.error("Error fetching credits:", error);
+    }
   }
 
   useEffect(() => {
-    creditsCall(session?.user?.email);
+    const fetchTermsAndConditions = async () => {
+      console.log("session", session);
+      if (session) {
+        await creditsCall(session?.user?.email);
+        const checkTaS = await TermsAndConditions(session?.user?.email);
+        if (!checkTaS) {
+          setCheckTAS(true);
+        }
+        if (!checkTaS.accepted) {
+          setShowTACPopup(true);
+        }
+      }
+    };
+    fetchTermsAndConditions();
   }, [session]);
 
-  useEffect(() => {
-    console.log("session", session);
-  }, [session]);
+  const handleAcceptTerms = async () => {
+    if (tacLoading) return;
+    await creditsCall(session?.user?.email);
+
+    setTacLoading(true);
+
+    try {
+      const response = await fetch("/api/tac/update", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: session?.user?.email }),
+      });
+
+      if (response.ok) {
+        setShowTACPopup(false);
+        toast.success("Terms & Conditions accepted");
+      } else {
+        toast.error("Failed to update Terms & Conditions");
+      }
+    } catch (error) {
+      console.error("Error updating T&C:", error);
+      toast.error("Error updating Terms & Conditions");
+    } finally {
+      setTacLoading(false);
+    }
+  };
 
   function PopOverForPrefix() {
     const prefixData = useSelector((state) => state.phoneNoInput.prefix);
-
     const dispatch = useDispatch();
+
     useEffect(() => {
       dispatch(setPhoneNo(prefixData + " "));
       console.log("prefix", prefixData);
@@ -102,8 +153,8 @@ const Page = () => {
             className=" bg-[#e2e2e2] text-[#3f3f3f] box-content rounded-md p-[15px]   cursor-pointer  md:p-[22px] border-[#767676] border-4  md:border-8 md:border-r-0 border-r-0 active:ml-3 hover:opacity-90 transition-all duration-150 rounded-tr-none rounded-br-none md:py-0 h-[28px] md:min-h-[70px]"
           />
         </PopoverTrigger>
-        <PopoverContent className="bg-[#e2e2e2]">
-          <div className=" w-[60px]  md:w-[75px] ">
+        <PopoverContent className="bg-[#e2e2e2] p-0">
+          <div className="w-[60px] md:w-[75px] max-h-[200px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
             {Object.entries(prefixLengths).map(([prefix, length]) => (
               <div
                 key={prefix}
@@ -111,7 +162,7 @@ const Page = () => {
                   dispatch(setPrefix(prefix));
                   dispatch(setPhoneNo(prefix + " "));
                 }}
-                className={`p-2 transition-all select-none duration-150 rounded-md cursor-pointer px-5 ${
+                className={`p-2 transition-all select-none duration-150 cursor-pointer px-5 ${
                   prefix === prefixData
                     ? "bg-[#3f3f3f] text-white hover:bg-[#3f3f3f]"
                     : "hover:bg-[#c8c8c8]"
@@ -125,6 +176,7 @@ const Page = () => {
       </Popover>
     );
   }
+
   // Content Component
   const Content = () => {
     const inputRef = useRef(null);
@@ -150,7 +202,6 @@ const Page = () => {
     const prefix = useSelector((state) => state.phoneNoInput.prefix);
     const phoneNo = useSelector((state) => state.phoneNoInput.value);
     const router = useRouter();
-    const pathname = usePathname();
     const searchParams = useSearchParams(); // Get the query parameters
 
     // Handler for phone number input change
@@ -318,7 +369,7 @@ const Page = () => {
       console.log("sid", sid);
       let setStarted = false;
       const eventSource = new EventSource(
-        `http://localhost:3000/api/call-status-check?sid=${sid}`
+        `https://www.uniika.in/api/call-status-check?sid=${sid}`
       );
 
       eventSource.onopen = () => {
@@ -335,8 +386,9 @@ const Page = () => {
         if (data?.Data?.status == "completed" && data?.Data?.recordingUrl) {
           setRecUrl(data?.Data?.recordingUrl);
           creditsCall(session?.user?.email);
-
           setIsRestart(true);
+          eventSource.close();
+          setSseEstablished(false);
         }
         // console.log("recUrl", recUrl);
 
@@ -357,6 +409,7 @@ const Page = () => {
             setStatus("Call Ended");
             setStatusColor("#E85C0D");
             setRecUrl(data?.Data?.recordingUrl);
+            creditsCall(session?.user?.email);
 
             setTimeout(() => {
               setStatus("recordingUrl");
@@ -456,6 +509,7 @@ const Page = () => {
               });
             }, 2000);
           } else if (audioFile != null) {
+            // Handle audio file case
             // Handle audio file case
             const response = await fetch("/api/upload-audio", {
               method: "POST",
@@ -717,22 +771,29 @@ const Page = () => {
             </>
           )}
         </div>
-        {/* Logout button */}
+        {/* Logout and Help buttons */}
         {session && (
-          <button
-            onClick={() => {
-              signOut({ redirect: false })
-                .then(() => {
-                  window.location.href = "/";
-                })
-                .catch((error) => {
-                  console.error("Logout error:", error);
-                });
-            }}
-            className="absolute bottom-4 right-1 bg-red-500 bg-opacity-50 text-white px-4 py-2 rounded-md hover:bg-opacity-70 transition-all duration-300 flex text-sm items-center gap-2"
-          >
-            Logout <IoIosExit size={20} className="opacity-75" />
-          </button>
+          <div className="absolute bottom-4 right-1 flex gap-2">
+            <button
+              onClick={() => {
+                signOut({ redirect: false })
+                  .then(() => {
+                    window.location.href = "/";
+                  })
+                  .catch((error) => {
+                    console.error("Logout error:", error);
+                  });
+              }}
+              className="bg-red-500 bg-opacity-50 text-white px-4 py-2 rounded-md hover:bg-opacity-70 transition-all duration-300 flex text-sm items-center gap-2"
+            >
+              Logout <IoIosExit size={20} className="opacity-75" />
+            </button>
+            <Link href="/contact">
+              <button className="bg-blue-500 bg-opacity-50 text-white px-4 py-2 rounded-md hover:bg-opacity-70 transition-all duration-300 flex text-sm items-center gap-2">
+                Help
+              </button>
+            </Link>
+          </div>
         )}
       </div>
     ) : null;
@@ -742,7 +803,11 @@ const Page = () => {
   return (
     <div className="w-full h-[calc(100svh)]">
       <Header />
-
+      <TermsACPopup
+        open={showTACPopup}
+        onAccept={handleAcceptTerms}
+        isLoading={tacLoading}
+      />
       <section className="flex overflow-auto h-[calc(100svh-60px)] min-h-[500px]">
         <div className="w-full h-[100%] overflow-auto min-h-[500px]">
           <Content />

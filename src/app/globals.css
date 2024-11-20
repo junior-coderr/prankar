@@ -194,3 +194,8 @@
 .paytoneOne {
   font-family: "Paytone One", sans-serif;
 }
+
+/* Hide the close icon in AlertDialogContent */
+.absolute.right-4.top-4.rounded-sm.opacity-70 {
+  display: none;
+}
