@@ -368,9 +368,7 @@ const Page = () => {
     const serverSEvent = async (sid) => {
       console.log("sid", sid);
       let setStarted = false;
-      const eventSource = new EventSource(
-        `https://uniika.in/api/call-status-check?sid=${sid}`
-      );
+      const eventSource = new EventSource(`/api/call-status-check?sid=${sid}`);
 
       eventSource.onopen = () => {
         console.log("Connection to server opened.");
