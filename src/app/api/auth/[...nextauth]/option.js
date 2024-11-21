@@ -64,7 +64,7 @@ const Options = {
       }
     },
     async redirect({ url, baseUrl }) {
-      return baseUrl + "/home";
+      return baseUrl + "/api/auth/callback/google";
     },
     async jwt({ token, account, user }) {
       if (account) {
