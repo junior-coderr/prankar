@@ -41,6 +41,11 @@ const Options = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      // authorization: {
+      //   params: {
+      //     redirect_uri: process.env.NEXTAUTH_URL + "/api/auth/callback/google",
+      //   },
+      // },
     }),
   ],
   callbacks: {
@@ -64,7 +69,7 @@ const Options = {
       }
     },
     async redirect({ url, baseUrl }) {
-      return baseUrl + "/api/auth/callback/google";
+      return baseUrl + "/home";
     },
     async jwt({ token, account, user }) {
       if (account) {

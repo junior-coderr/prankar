@@ -369,7 +369,7 @@ const Page = () => {
       console.log("sid", sid);
       let setStarted = false;
       const eventSource = new EventSource(
-        `http://www.uniika.in/api/call-status-check?sid=${sid}`
+        `https://uniika.in/api/call-status-check?sid=${sid}`
       );
 
       eventSource.onopen = () => {
