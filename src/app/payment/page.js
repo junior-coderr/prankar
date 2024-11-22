@@ -95,7 +95,7 @@ const Payment = () => {
 
     const initialOptions = {
       "client-id":
-        "AflEnex5QdfWv-7Y9qorPmePi3LlQ_w4GKazu1AoCm2AVL3gIzB96LCB2EuiuuX4qlKH3jjQl_HN4nKG",
+        "AR5nROE58zmq06_zRkt-6zLcZb5HIJKsmCAiAXqFgHmYw8TLmP0AWPOpVoLSlFvWebLJAEHIaa9dwwGD",
       "enable-funding": "venmo",
       currency: "USD",
       "data-page-type": "product-details",

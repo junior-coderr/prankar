@@ -1,4 +1,4 @@
-const base = "https://api-m.sandbox.paypal.com";
+const base = "https://api-m.paypal.com";
 // import { generateAccessToken } from "../../../../../helpers/palpal/generateAccessToken";
 import { generateAccessToken } from "../../../../utils/paypal/generateAccessToken";
 import { handleResponse } from "../../../../utils/paypal/handleResponse";

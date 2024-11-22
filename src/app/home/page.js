@@ -143,7 +143,7 @@ const Page = () => {
     useEffect(() => {
       dispatch(setPhoneNo(prefixData + " "));
       console.log("prefix", prefixData);
-    }, [prefixData]);
+    }, [prefixData, dispatch]);
 
     return (
       <Popover>
@@ -363,7 +363,7 @@ const Page = () => {
         handleScroll("down");
         handleScroll("down");
       }
-    }, []);
+    }, [searchParams]);
 
     const serverSEvent = async (sid) => {
       console.log("sid", sid);
@@ -771,7 +771,7 @@ const Page = () => {
         </div>
         {/* Logout and Help buttons */}
         {session && (
-          <div className="absolute bottom-4 right-1 flex gap-2">
+          <div className="fixed md:absolute bottom-4 right-1 left-1 flex gap-2 flex-col md:flex-row px-2 md:px-0">
             <button
               onClick={() => {
                 signOut({ redirect: false })
@@ -782,12 +782,12 @@ const Page = () => {
                     console.error("Logout error:", error);
                   });
               }}
-              className="bg-red-500 bg-opacity-50 text-white px-4 py-2 rounded-md hover:bg-opacity-70 transition-all duration-300 flex text-sm items-center gap-2"
+              className="bg-red-500 bg-opacity-50 text-white px-2 md:px-4 py-1 md:py-2 rounded-md hover:bg-opacity-70 transition-all duration-300 flex text-xs md:text-sm items-center justify-center gap-1 md:gap-2 w-full min-w-[80px]"
             >
-              Logout <IoIosExit size={20} className="opacity-75" />
+              Logout <IoIosExit size={16} className="opacity-75" />
             </button>
-            <Link href="/contact">
-              <button className="bg-blue-500 bg-opacity-50 text-white px-4 py-2 rounded-md hover:bg-opacity-70 transition-all duration-300 flex text-sm items-center gap-2">
+            <Link href="/contact" className="w-full">
+              <button className="bg-blue-500 bg-opacity-50 text-white px-2 md:px-4 py-1 md:py-2 rounded-md hover:bg-opacity-70 transition-all duration-300 flex text-xs md:text-sm items-center justify-center gap-1 md:gap-2 w-full min-w-[80px]">
                 Help
               </button>
             </Link>

@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 import {
   Sheet,
@@ -25,7 +25,7 @@ const SideBar = ({ props }) => {
   const creditRef = useRef();
   let cValue = null;
 
-  async function creditsCall(email) {
+  const creditsCall = useCallback(async (email) => {
     if (!email) return;
     // console.log("emaildwefw", email);
     const c = await getCredits(email);
@@ -36,11 +36,12 @@ const SideBar = ({ props }) => {
     if (creditRef.current) creditRef.current.textContent = c;
     cValue = c;
     // console.log("credits", credits);
-  }
+  }, []);
+
   useEffect(() => {
     creditsCall(props.content.user.email);
     console.log("ggg", props.content.user.image);
-  }, [props.content, creditRef.current]);
+  }, [props.content, creditsCall]);
 
   return (
     <div
@@ -83,22 +84,29 @@ const SideBar = ({ props }) => {
           </>
         )}
       </div>
-      {/* Logout button */}
+      {/* Buttons section - modified to center buttons */}
       {props.content && (
-        <button
-          onClick={() => {
-            signOut({ redirect: false })
-              .then(() => {
-                window.location.href = "/";
-              })
-              .catch((error) => {
-                console.error("Logout error:", error);
-              });
-          }}
-          className="absolute bottom-12 right-1 bg-red-500 bg-opacity-50 text-white px-4 py-2 rounded-md hover:bg-opacity-70 transition-all duration-300 flex text-sm items-center gap-2"
-        >
-          Logout <IoIosExit size={20} className="opacity-75" />
-        </button>
+        <div className="absolute bottom-12 left-0 right-0 flex flex-col items-center gap-2 px-4">
+          <button
+            onClick={() => {
+              signOut({ redirect: false })
+                .then(() => {
+                  window.location.href = "/";
+                })
+                .catch((error) => {
+                  console.error("Logout error:", error);
+                });
+            }}
+            className="bg-red-500 bg-opacity-50 text-white px-4 py-2 rounded-md hover:bg-opacity-70 transition-all duration-300 flex text-sm items-center gap-2 w-full justify-center"
+          >
+            Logout <IoIosExit size={20} className="opacity-75" />
+          </button>
+          <Link href="/contact" className="w-full">
+            <button className="bg-blue-500 bg-opacity-50 text-white px-4 py-2 rounded-md hover:bg-opacity-70 transition-all duration-300 flex text-sm items-center gap-2 w-full justify-center">
+              Help
+            </button>
+          </Link>
+        </div>
       )}
     </div>
   );

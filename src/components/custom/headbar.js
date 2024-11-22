@@ -24,7 +24,7 @@ const Headbar = () => {
         className={`${poppins.className} w-full border-0 border-b-[1px] border-b-[#3f3f3f] bg-[#2f322faf] relative h-[60px] p-5 flex justify-between text-[#ffffff] select-none `}
       >
         <Link href="/" className="paytoneOne text-xl md:text-2xl font-[400]">
-          PRANKAR
+          UNIIKA
         </Link>
 
         <div

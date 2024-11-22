@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Poppins } from "next/font/google";
 import Header from "../../components/custom/headbar";
 import { toast } from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const poppins = Poppins({
   weight: ["400", "700"],
@@ -10,6 +11,7 @@ const poppins = Poppins({
 });
 
 const Contact = () => {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -56,7 +58,13 @@ const Contact = () => {
     >
       <Header />
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] p-6">
-        <div className="w-full max-w-md bg-white/10 backdrop-blur-sm rounded-lg p-8 shadow-xl">
+        <div className="relative w-full max-w-md bg-white/10 backdrop-blur-sm rounded-lg p-8 shadow-xl">
+          <button
+            onClick={() => router.back()}
+            className="absolute left-4 top-4 text-white/70 hover:text-white transition-colors"
+          >
+            ← Back
+          </button>
           <h1 className="text-3xl font-bold mb-6 text-center">Get in Touch</h1>
           <p className="text-gray-300 text-center mb-8">
             Have questions? We&apos;d love to hear from you.

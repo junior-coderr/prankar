@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import Link from "next/link";
 import {
   Dialog,
   DialogContent,
@@ -15,7 +16,7 @@ const TermsACPopup = ({ open, onAccept, isLoading }) => {
     <Dialog open={open} hideCloseButton>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Terms and Conditions</DialogTitle>
+          <DialogTitle>Conditions</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="text-sm max-h-[350px] overflow-auto">
@@ -70,7 +71,14 @@ const TermsACPopup = ({ open, onAccept, isLoading }) => {
             </ul>
           </div>
         </div>
-        <DialogFooter>
+        <DialogFooter className="flex flex-col gap-4 sm:flex-row sm:justify-between">
+          <Link
+            href="/termsandconditions"
+            className="text-sm text-blue-500 hover:text-blue-400"
+            target="_blank"
+          >
+            View Full Terms & Conditions
+          </Link>
           <Button onClick={onAccept} disabled={isLoading}>
             {isLoading ? <Loader3 /> : "Accept & Continue"}
           </Button>
