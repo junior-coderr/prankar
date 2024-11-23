@@ -75,7 +75,7 @@ const Options = {
 
       // Attach user data to the token
       if (user) {
-        token.id = user?.id || token?.id;
+        token.id = user.id || token.id;
         token.email = user.email || token.email;
         token.name = user.name || token.name;
         token.image = user.image || token.image;
@@ -95,7 +95,7 @@ const Options = {
       session.error = token.error;
 
       session.user = {
-        id: token?.id,
+        id: token.id,
         email: token.email,
         name: token.name,
         image: token.image,

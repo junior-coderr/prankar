@@ -19,7 +19,7 @@ async function manualLogin(router) {
     console.log("Session created manually");
     console.log(await response.json());
     router.push("/home");
-    window.location.reload();
+    // window.location.reload();
   } else {
     const error = await response.json();
     console.error("Failed to create session:", error);
