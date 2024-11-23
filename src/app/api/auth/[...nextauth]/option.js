@@ -67,6 +67,8 @@ const Options = {
     },
     async jwt({ token, account, user }) {
       // If a new account is being created, attach account data
+      console.log("secret", process.env.NEXTAUTH_SECRET);
+      console.log("URL", process.env.NEXTAUTH_URL);
       if (account) {
         token.accessToken = account.access_token;
         token.accessTokenExpires = Date.now() + account.expires_in * 1000; // Access token expiration
@@ -92,6 +94,8 @@ const Options = {
     },
     async session({ session, token }) {
       // Attach token data to the session object
+      console.log("secret", process.env.NEXTAUTH_SECRET);
+      console.log("URL", process.env.NEXTAUTH_URL);
       session.accessToken = token.accessToken;
       session.error = token.error;
 

@@ -14,6 +14,7 @@ async function handler(req) {
     }
 
     // Generate a JWT token
+
     const token = await encode({
       secret: process.env.NEXTAUTH_SECRET,
       token: {
@@ -23,6 +24,8 @@ async function handler(req) {
         role: "user", // Example custom field, hardcoded or passed
       },
     });
+    console.log("secret", process.env.NEXTAUTH_SECRET);
+    console.log("URL", process.env.NEXTAUTH_URL);
 
     // Set the JWT in a secure HTTP-only cookie with NextAuth's default name
     const response = NextResponse.json({
@@ -33,6 +36,7 @@ async function handler(req) {
       "Set-Cookie",
       `__Host-next-auth.session-token=${token}; Path=/; HttpOnly; Secure; SameSite=Strict`
     );
+    console.log("token", token);
     return response;
   } catch (error) {
     console.error("Error creating session:", error);

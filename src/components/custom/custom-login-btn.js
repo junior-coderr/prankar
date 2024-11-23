@@ -1,6 +1,5 @@
 import React from "react";
 import { useRouter } from "next/navigation";
-import jwt from "jsonwebtoken";
 
 async function manualLogin(router) {
   const response = await fetch("/api/custom-login", {
@@ -20,10 +19,6 @@ async function manualLogin(router) {
     console.log("Session created manually");
     const t = await response.json();
     console.log(t);
-    const { token } = t;
-
-    const decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET);
-    console.log("Decoded Token:", decoded);
 
     router.push("/home");
     // window.location.reload();
