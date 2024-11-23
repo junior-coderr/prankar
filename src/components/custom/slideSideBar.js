@@ -73,6 +73,7 @@ const SideBar = ({ props }) => {
               {/* Credits left: {credits ? credits : "..."} */}
               Credits left: {<span ref={creditRef}></span>}
             </p>
+            <p>{/* <CustomLogin /> */}</p>
             <Link href={"/payment"} className="flex  gap-2  items-center">
               Credits <FaArrowRight className="text-green-600 text-[18px]" />
             </Link>

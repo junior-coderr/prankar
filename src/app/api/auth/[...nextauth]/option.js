@@ -3,7 +3,6 @@ dotenv.config();
 import GoogleProvider from "next-auth/providers/google";
 import connect from "../../../utils/mongodb/connect";
 import User from "app/utils/MongoSchema/user";
-// import { jwt } from "twilio";
 
 async function refreshAccessToken(token) {
   try {
@@ -41,11 +40,6 @@ const Options = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      // authorization: {
-      //   params: {
-      //     redirect_uri: process.env.NEXTAUTH_URL + "/api/auth/callback/google",
-      //   },
-      // },
     }),
   ],
   callbacks: {
@@ -60,7 +54,7 @@ const Options = {
             image: user.user.image,
           });
           await newUser.save();
-          console.log("User created ");
+          console.log("User created");
         }
         return true;
       } catch (error) {
@@ -72,42 +66,50 @@ const Options = {
       return baseUrl + "/home";
     },
     async jwt({ token, account, user }) {
+      // If a new account is being created, attach account data
       if (account) {
         token.accessToken = account.access_token;
         token.accessTokenExpires = Date.now() + account.expires_in * 1000; // Access token expiration
-      }
-      if (user) {
-        token.id = user.id;
-        token.email = user.email;
-        token.name = user.name;
-        token.image = user.image;
+        token.refreshToken = account.refresh_token; // Store the refresh token
       }
 
-      // Refresh token if it has expired
+      // Attach user data to the token
+      if (user) {
+        token.id = user?.id || token?.id;
+        token.email = user.email || token.email;
+        token.name = user.name || token.name;
+        token.image = user.image || token.image;
+      }
+
+      // Refresh the access token if it has expired
       if (Date.now() > token.accessTokenExpires) {
-        const newToken = await refreshAccessToken(token); // You need to implement this
-        token.accessToken = newToken.accessToken;
-        token.accessTokenExpires = newToken.accessTokenExpires;
+        const newToken = await refreshAccessToken(token);
+        return newToken; // Replace the old token with the refreshed one
       }
 
       return token;
     },
     async session({ session, token }) {
+      // Attach token data to the session object
       session.accessToken = token.accessToken;
       session.error = token.error;
-      if (token) {
-        session.user.id = token.id;
-        session.user.email = token.email;
-        session.user.name = token.name;
-        session.user.image = token.image;
-      }
+
+      session.user = {
+        id: token?.id,
+        email: token.email,
+        name: token.name,
+        image: token.image,
+      };
+
       return session;
     },
-    secret: process.env.NEXTAUTH_SECRET, // Important for JWT encryption
   },
-
+  secret: process.env.NEXTAUTH_SECRET, // Required for JWT encryption
+  session: {
+    strategy: "jwt", // Use JWT for sessions
+  },
   pages: {
-    signIn: "/",
+    signIn: "/", // Redirect to the root page for sign-in
   },
 };
 

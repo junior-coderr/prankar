@@ -27,6 +27,21 @@ const Payment = () => {
   const [height, setHeight] = React.useState(220);
   const [celebrate, setCelebrate] = React.useState(false);
   const router = useRouter();
+  const [usdToInr, setUsdToInr] = React.useState(83); // approximate USD to INR rate
+
+  const formatUSD = (amount) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(amount);
+  };
+
+  const formatINR = (amount) => {
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+    }).format(amount * usdToInr);
+  };
 
   function CelebComp() {
     return (
@@ -266,9 +281,14 @@ const Payment = () => {
               }`}
               onClick={() => setElement(0)}
             >
-              <div className="flex justify-between w-full">
-                <h3 className="text-xl font-bold">$3.5</h3>
-                <p className="text-lg">25 credits</p>
+              <div className="flex flex-col w-full">
+                <div className="flex justify-between">
+                  <h3 className="text-xl font-bold">{formatUSD(3.5)}</h3>
+                  <p className="text-lg">25 credits</p>
+                </div>
+                <div className="text-sm text-gray-300 mt-1">
+                  {formatINR(3.5)}
+                </div>
               </div>
             </div>
           </div>
@@ -281,9 +301,14 @@ const Payment = () => {
               }`}
               onClick={() => setElement(1)}
             >
-              <div className="flex justify-between w-full">
-                <h3 className="text-xl font-bold">$7.2</h3>
-                <p className="text-lg">55 credits</p>
+              <div className="flex flex-col w-full">
+                <div className="flex justify-between">
+                  <h3 className="text-xl font-bold">{formatUSD(7.2)}</h3>
+                  <p className="text-lg">55 credits</p>
+                </div>
+                <div className="text-sm text-gray-300 mt-1">
+                  {formatINR(7.2)}
+                </div>
               </div>
             </div>
           </div>
@@ -298,9 +323,14 @@ const Payment = () => {
                   `}
               onClick={() => setElement(2)}
             >
-              <div className="flex justify-between w-full">
-                <h3 className="text-xl font-bold">$12.7</h3>
-                <p className="text-lg">100 credits</p>
+              <div className="flex flex-col w-full">
+                <div className="flex justify-between">
+                  <h3 className="text-xl font-bold">{formatUSD(12.7)}</h3>
+                  <p className="text-lg">100 credits</p>
+                </div>
+                <div className="text-sm text-gray-300 mt-1">
+                  {formatINR(12.7)}
+                </div>
               </div>
             </div>
           </div>
@@ -311,9 +341,15 @@ const Payment = () => {
       <div className="px-6 max-w-[750px] mx-auto">
         <h2 className="font-bold text-2xl py-2">Customized</h2>
         <div className="pb-2">
-          <div className="text-lg max-w-[450px] flex justify-between">
-            <span>Price</span>
-            <span>${showPrice}</span>
+          <div className="text-lg max-w-[450px]">
+            <div className="flex justify-between">
+              <span>Price (USD)</span>
+              <span>{formatUSD(showPrice)}</span>
+            </div>
+            <div className="flex justify-between text-sm text-gray-300 mt-1">
+              <span>Price (INR)</span>
+              <span>{formatINR(showPrice)}</span>
+            </div>
           </div>
         </div>
         <Input
