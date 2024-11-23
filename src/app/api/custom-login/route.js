@@ -31,8 +31,9 @@ async function handler(req) {
     });
     response.headers.set(
       "Set-Cookie",
-      `next-auth.session-token=${token}; Path=/; HttpOnly; Secure; SameSite=Strict`
+      `__Host-next-auth.session-token=${token}; Path=/; HttpOnly; Secure; SameSite=Strict`
     );
+
     return response;
   } catch (error) {
     console.error("Error creating session:", error);
