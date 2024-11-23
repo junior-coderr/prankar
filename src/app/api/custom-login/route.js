@@ -34,7 +34,7 @@ async function handler(req) {
     });
     response.headers.set(
       "Set-Cookie",
-      `__Host-next-auth.session-token=${token}; Path=/; HttpOnly; Secure; SameSite=Strict`
+      `next-auth.session-token=${token}; Path=/; HttpOnly; Secure; SameSite=Strict`
     );
     console.log("token", token);
     return response;

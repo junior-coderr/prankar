@@ -9,7 +9,7 @@ async function decryptJWE(token, secret) {
 
     // Decrypt the JWE token
     const result = await jose.JWE.createDecrypt(key).decrypt(
-      "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..ZSdRWt2cJb5Z_nL5.GK9pdED5A7NbjYQP6YVR1RLQzOXa6bD3mPA71mN_vABLgRK6zfVqG9wVXZxss1TQHroMD9g0hvX6--a2t8u5ALoCSoW0Msatu_MlLihsF90WAMOKU15zPFv77cM3NL4DsJcxvKeVs8ZVF0GQ0vpo9-7OXAYmw9lCH2HJhFwVxgqV0uf08GigR-ABdwESFxtS7C2b9aJDZ02svpru9JCu_sfI__xoy4tWuLupldLdQX3PlQDoxlbQkQ6Gbb7lU3VLibOpdpZC0UX-T9b7HWpqajzdASponE1y8nE4dj-lWJ_34X8xTHPE5mWnaXJmJVlmXA.fwEbx9JuFSRB6mt3Rnd_qg"
+      "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..-76EJzBUMU4SglXA.l_E1BTqpvD6mw4oRzOE3zl8qXryxIAtPIpOGfaMOuRF4t8AvsgKHn1SglC2tEuW80UYI_e0xFwPBOnCBt5g8JOA5RvUxNomQQSglhrLxYC9Ppg0KkFfvmnOIvyvDbZTiQqZ8FLyehdWrJWp86tTzOvN1kJu8PudS8ga2aE1ft1mRBTGrNOse5vWh9BSV_JGRXX7m8W4dSZYJZIADOM0ehsUafMUdKDW-rI2uY7zUBuRHcYLaOOtU_ByPFe41iWF65zCIcQ9VK5k5Q3A5jNBPSiPVlzJ-dw8EGEwT9C8Ya-vlQKoqKDQDb6ACxa0ginBDWg.RyrNEvkO3uYVSa0sS9ynjg"
     );
     const payload = result.plaintext.toString("utf-8");
     console.log("Decrypted Payload:", payload);
