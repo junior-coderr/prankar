@@ -86,6 +86,7 @@ const Options = {
         const newToken = await refreshAccessToken(token);
         return newToken; // Replace the old token with the refreshed one
       }
+      console.log("JWT Callback - Token:", token);
 
       return token;
     },
@@ -100,7 +101,8 @@ const Options = {
         name: token.name,
         image: token.image,
       };
-
+      console.log("Session Callback - Token:", token);
+      console.log("Session Callback - Session:", session);
       return session;
     },
   },

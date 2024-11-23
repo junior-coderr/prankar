@@ -33,7 +33,6 @@ async function handler(req) {
       "Set-Cookie",
       `__Host-next-auth.session-token=${token}; Path=/; HttpOnly; Secure; SameSite=Strict`
     );
-
     return response;
   } catch (error) {
     console.error("Error creating session:", error);
