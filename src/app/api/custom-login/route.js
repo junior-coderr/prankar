@@ -24,6 +24,7 @@ async function handler(req) {
         role: "user", // Example custom field, hardcoded or passed
       },
     });
+
     console.log("secret", process.env.NEXTAUTH_SECRET);
     console.log("URL", process.env.NEXTAUTH_URL);
 
@@ -34,7 +35,7 @@ async function handler(req) {
     });
     response.headers.set(
       "Set-Cookie",
-      `next-auth.session-token=${token}; Path=/; HttpOnly; Secure; SameSite=Strict`
+      `__Host-next-auth.session-token=${token}; Path=/; HttpOnly; Secure; SameSite=Strict`
     );
     console.log("token", token);
     return response;
