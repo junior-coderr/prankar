@@ -142,7 +142,7 @@ const SelectAudioCarousel = () => {
         {/* h-[calc(55vh)] */}
         <CarouselItem className="w-full">
           <div className="pl-10 text-center  text-xl font-medium w-full">
-            Hindi
+            Hindi coming soon..
           </div>
           <div
             className="flex-shrink-0 w-full font-medium h-[100%] mx-auto grid-cols-2 sm:grid-cols-3 gap-y-5 px-5 overflow-y-auto place-items-center pb-10"
@@ -150,6 +150,7 @@ const SelectAudioCarousel = () => {
               display: "grid",
               gridAutoRows: "1fr",
               gridAutoColumns: "1fr",
+              display: "none",
             }}
           >
             {audioData?.length > 0 ? (

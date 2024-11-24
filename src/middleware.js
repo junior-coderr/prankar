@@ -1,14 +1,37 @@
 // middleware.ts
 import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { decode } from "next-auth/jwt";
 
 export async function middleware(req) {
   // Get the token from the request using NextAuth's built-in helper
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  let token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
   if (!token) {
-    // If no token is found, redirect or return an unauthorized response
-    return NextResponse.redirect(new URL("/", req.url));
+    const cookieStore = cookies();
+    var t = cookieStore.get("token")?.value;
+    if (!t) {
+      // If no token is found, redirect or return an unauthorized response
+      return NextResponse.redirect(new URL("/", req.url));
+    } else {
+      try {
+        const decoded = await decode({
+          token: t, // Change: use 'token' instead of passing t directly
+          secret: process.env.NEXTAUTH_SECRET,
+        });
+
+        if (!decoded) {
+          return NextResponse.redirect(new URL("/", req.url));
+        }
+
+        token = decoded;
+        console.log("decoded token:", decoded);
+      } catch (error) {
+        console.error("Token decode error:", error);
+        return NextResponse.redirect(new URL("/", req.url));
+      }
+    }
     // return NextResponse.next();
   }
 
