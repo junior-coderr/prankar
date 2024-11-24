@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Poppins } from "next/font/google";
 import { Input } from "components/ui/input";
 const poppins = Poppins({
@@ -28,6 +28,32 @@ const Payment = () => {
   const [celebrate, setCelebrate] = React.useState(false);
   const router = useRouter();
   const [usdToInr, setUsdToInr] = React.useState(83); // approximate USD to INR rate
+  const [custom_session, setCustom_session] = useState(null);
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    async function getCustomFun() {
+      try {
+        const decodedToken = await fetch("/api/get-data-custom-login");
+        const customSession = await decodedToken.json();
+        setCustom_session({ user: customSession });
+      } catch (err) {
+        console.log("error fetching custom token data", err);
+      }
+    }
+    getCustomFun();
+  }, []);
+
+  // Helper function to get active session
+  const getActiveSession = () => {
+    if (session) {
+      return session;
+    } else if (custom_session?.user?.email) {
+      return custom_session;
+    } else {
+      return null;
+    }
+  };
 
   const formatUSD = (amount) => {
     return new Intl.NumberFormat("en-US", {
@@ -102,11 +128,7 @@ const Payment = () => {
   function Paypal() {
     const element = useSelector((state) => state.transaction.element);
     const credits = useSelector((state) => state.transaction.credits);
-    const { data: session } = useSession();
-
-    // React.useEffect(() => {
-    //   console.log("session", session);
-    // }, [session]);
+    const activeSession = getActiveSession();
 
     const initialOptions = {
       "client-id":
@@ -137,7 +159,7 @@ const Payment = () => {
       setIsLoading(false);
     }, []);
 
-    return session && session?.user ? (
+    return activeSession && activeSession?.user ? (
       <PayPalScriptProvider className="" options={initialOptions}>
         {isLoading ? (
           <Loader3 />
@@ -158,7 +180,7 @@ const Payment = () => {
                   body: JSON.stringify({
                     element,
                     credits,
-                    email: session?.user?.email,
+                    email: activeSession?.user?.email,
                   }),
                 });
 
@@ -190,7 +212,7 @@ const Payment = () => {
                       "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                      email: session?.user?.email,
+                      email: activeSession?.user?.email,
                     }),
                   }
                 );

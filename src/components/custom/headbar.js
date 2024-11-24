@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import LoginPop from "./loginPop";
@@ -12,11 +12,34 @@ const poppins = Poppins({
 });
 
 const Headbar = () => {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
+  const [custom_session, setCustom_session] = useState(null);
 
   useEffect(() => {
-    console.log("session", session);
-  }, [session]);
+    async function getCustomFun() {
+      try {
+        const decodedToken = await fetch("/api/get-data-custom-login");
+        const customSession = await decodedToken.json();
+        setCustom_session({ user: customSession });
+      } catch (err) {
+        console.log("error fetching custom token data", err);
+      }
+    }
+    getCustomFun();
+  }, []);
+
+  // Helper function to get active session
+  const getActiveSession = () => {
+    if (session) {
+      return session;
+    } else if (custom_session?.user?.email) {
+      return custom_session;
+    } else {
+      return null;
+    }
+  };
+
+  const activeSession = getActiveSession();
 
   return (
     <>
@@ -30,11 +53,11 @@ const Headbar = () => {
         <div
           className={`flex gap-1 justify-center items-center text-md cursor hover:bg-[#3f3f3f] p-4  cursor-pointer border-[1px] border-[#3f3f3f] relative bg-[#2f2f2f] rounded-md transition-all duration-300 `}
         >
-          {session ? (
+          {activeSession ? (
             window.innerWidth < 768 ? (
-              <SlideSideBar content={session} />
+              <SlideSideBar content={activeSession} />
             ) : (
-              "Ahoy, " + session?.user?.name?.split(" ")[0]
+              "Ahoy, " + activeSession?.user?.name?.split(" ")[0]
             )
           ) : (
             <LoginPop />

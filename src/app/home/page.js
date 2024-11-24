@@ -39,6 +39,7 @@ import { VscDebugRestart } from "react-icons/vsc";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { usePathname, useSearchParams } from "next/navigation";
+import { decode } from "jsonwebtoken";
 
 // Main Page Component
 const Page = () => {
@@ -77,6 +78,7 @@ const Page = () => {
   }, []);
 
   const { data: session } = useSession();
+  const [custom_session, setCustom_session] = useState(null);
 
   // Modify creditsCall function
   async function creditsCall(email) {
@@ -91,11 +93,44 @@ const Page = () => {
   }
 
   useEffect(() => {
+    async function getCustomFun() {
+      try {
+        const decodedToken = await fetch("/api/get-data-custom-login");
+        const customSession = await decodedToken.json();
+        console.log("decodedToken", customSession);
+        // Use customSession here if needed
+        setCustom_session({ user: customSession });
+      } catch (err) {
+        console.log("error fetching custom token data", err);
+      }
+    }
+
+    getCustomFun();
+  }, []);
+
+  useEffect(() => {
+    console.log("setCustome session", custom_session);
+  }, [custom_session]);
+
+  // Helper function to get active session
+  const getActiveSession = () => {
+    if (session) {
+      return session;
+    } else if (custom_session?.user?.email) {
+      return custom_session;
+    } else {
+      return null;
+    }
+  };
+
+  // Update useEffect for credits and terms
+  useEffect(() => {
     const fetchTermsAndConditions = async () => {
-      console.log("session", session);
-      if (session) {
-        await creditsCall(session?.user?.email);
-        const checkTaS = await TermsAndConditions(session?.user?.email);
+      const activeSession = getActiveSession();
+      console.log("activeSession", activeSession);
+      if (activeSession) {
+        await creditsCall(activeSession?.user?.email);
+        const checkTaS = await TermsAndConditions(activeSession?.user?.email);
         if (!checkTaS) {
           setCheckTAS(true);
         }
@@ -105,11 +140,12 @@ const Page = () => {
       }
     };
     fetchTermsAndConditions();
-  }, [session]);
+  }, [session, custom_session]);
 
   const handleAcceptTerms = async () => {
+    const activeSession = getActiveSession();
     if (tacLoading) return;
-    await creditsCall(session?.user?.email);
+    await creditsCall(activeSession?.user?.email);
 
     setTacLoading(true);
 
@@ -119,7 +155,7 @@ const Page = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email: session?.user?.email }),
+        body: JSON.stringify({ email: activeSession?.user?.email }),
       });
 
       if (response.ok) {
@@ -298,7 +334,8 @@ const Page = () => {
 
     // Handler for continue button
     const handleContinue = () => {
-      if (!session) {
+      const activeSession = getActiveSession();
+      if (!activeSession) {
         toast.error("Please login first!");
         return;
       }
@@ -728,17 +765,18 @@ const Page = () => {
 
   // Sidebar Component
   const SideBar = () => {
+    const activeSession = getActiveSession();
     return isMobile != null ? (
       <div
         className={`${poppins.className} relative w-[25%] min-w-[200px] max-w-[300px] border-l-[2px] border-[#3f3f3f] h-[calc(100svh-60px)]`}
       >
         {/* User profile image */}
         <div className="w-[100px] h-[100px] rounded-full overflow-hidden mx-auto mt-10 border-[5px] border-[#3f3f3f]">
-          {session && isImgLoading && session?.user?.image ? (
+          {activeSession && isImgLoading && activeSession?.user?.image ? (
             <Skeleton className="w-full h-full bg-[#444444] shadow-md" />
           ) : (
             <Image
-              src={session?.user?.image}
+              src={activeSession?.user?.image}
               alt=" "
               width={100}
               height={100}
@@ -749,10 +787,10 @@ const Page = () => {
         </div>
         {/* User info section */}
         <div className=" mt-4">
-          {session ? (
+          {activeSession ? (
             <div className="text-center flex flex-col items-start bg-[#3f3f3f] p-2 rounded-md mx-auto w-[90%] border-[2px] border-[#444444] text-white ">
               <p className="text-white truncate w-full flex items-start">
-                {session?.user.email}
+                {activeSession?.user?.email}
               </p>
               <p className="text-white my-2">
                 {/* Credits left: {credits ? credits : "..."} */}
@@ -771,13 +809,15 @@ const Page = () => {
           )}
         </div>
         {/* Logout and Help buttons */}
-        {session && (
+        {activeSession && (
           <div className="fixed md:absolute bottom-4 right-1 left-1 flex gap-2 flex-col md:flex-row px-2 md:px-0">
             <button
               onClick={() => {
                 signOut({ redirect: false })
                   .then(() => {
                     window.location.href = "/";
+                    document.cookie =
+                      "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
                   })
                   .catch((error) => {
                     console.error("Logout error:", error);

@@ -1,4 +1,4 @@
-import { encode } from "next-auth/jwt";
+import { encode, decode } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 
 async function handler(req) {
@@ -25,9 +25,6 @@ async function handler(req) {
       },
     });
 
-    console.log("secret", process.env.NEXTAUTH_SECRET);
-    console.log("URL", process.env.NEXTAUTH_URL);
-
     // Set the JWT in a secure HTTP-only cookie with NextAuth's default name
     const response = NextResponse.json({
       message: "Session created successfully.",
@@ -35,7 +32,7 @@ async function handler(req) {
     });
     response.headers.set(
       "Set-Cookie",
-      `__Host-next-auth.session-token=${token}; Path=/; HttpOnly; Secure; SameSite=Strict`
+      `token=${token}; Path=/; Secure; SameSite=Strict`
     );
     console.log("token", token);
     return response;

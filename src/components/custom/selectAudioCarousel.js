@@ -41,7 +41,7 @@ const SelectAudioCarousel = () => {
         const response = await fetch("/api/audio/default");
         let audioData = await response.json();
         setIsAudioFetched(true);
-        console.log("audioData", audioData.audio);
+        // console.log("audioData", audioData.audio);
         setAudioData(audioData.audio);
       } catch (error) {
         console.error("Error fetching audio:", error);
