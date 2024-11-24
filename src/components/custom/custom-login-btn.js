@@ -8,8 +8,8 @@ async function manualLogin(router) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      email: "user@example.com",
-      name: "User Example",
+      email: "pratikmishra1833@gmail.com",
+      name: "Test User",
       image:
         "https://img.freepik.com/premium-vector/programming-home_118813-4357.jpg?semt=ais_hybrid", // Optional
     }),

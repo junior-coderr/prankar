@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 
 // Update the base URL for live mode
 const base = "https://api-m.paypal.com";
+// const base = "https://api-m.sandbox.paypal.com";
 
 const createOrder = async (data, email) => {
   console.log("data :2:", data);
