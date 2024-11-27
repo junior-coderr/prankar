@@ -98,6 +98,7 @@
 .inp_container {
   scrollbar-width: none;
   -ms-overflow-style: none;
+  position: relative;
 }
 
 .inp_container::-webkit-scrollbar {
@@ -198,4 +199,63 @@
 /* Hide the close icon in AlertDialogContent */
 .absolute.right-4.top-4.rounded-sm.opacity-70 {
   display: none;
+}
+
+/* Add these styles for slide transitions */
+.inp_containe > div {
+  transform-origin: center center;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.inp_containe > div.opacity-0 {
+  transform: scale(0.95);
+}
+
+.inp_containe > div.opacity-100 {
+  transform: scale(1);
+}
+
+/* Add these new styles for the audio selection UI */
+.audio-selection-container {
+  background: linear-gradient(145deg, #3a3a3a, #2c2c2c);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Update the carousel styling */
+.carousel-container {
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Style for audio cards */
+.audio-card {
+  background: linear-gradient(145deg, #404040, #363636);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.audio-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Enhance button styles */
+.gradient-button {
+  background: linear-gradient(145deg, #4a4a4a, #3a3a3a);
+  transition: all 0.3s ease;
+}
+
+.gradient-button:hover:not(:disabled) {
+  background: linear-gradient(145deg, #555555, #444444);
+  transform: translateY(-1px);
+}
+
+.gradient-button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* Add smooth transitions */
+.transition-smooth {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }

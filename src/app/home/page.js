@@ -229,22 +229,13 @@ const Page = () => {
 
     // Handler for scrolling
     const handleScroll = (type) => {
-      let height = scrollRef.current.scrollHeight;
-      let scrollAmount = height / 3;
       let newScroll = currentScrollRef.current;
 
       if (type === "up") {
-        newScroll = newScroll - 1;
+        newScroll = Math.max(0, newScroll - 1);
       } else {
-        newScroll = newScroll + 1;
+        newScroll = Math.min(2, newScroll + 1);
       }
-
-      newScroll = Math.max(0, Math.min(3, newScroll));
-
-      scrollRef.current.scrollTo({
-        top: scrollAmount * newScroll,
-        behavior: "smooth",
-      });
 
       currentScrollRef.current = newScroll;
       setCurrentScroll(newScroll);
@@ -298,10 +289,10 @@ const Page = () => {
 
     // Handler for continue button
     const handleContinue = () => {
-      if (!session) {
-        toast.error("Please login first!");
-        return;
-      }
+      // if (!session) {
+      //   toast.error("Please login first!");
+      //   return;
+      // }
       // console.log("sssss", creditRef.current.textContent);
       if (creditRef.current?.textContent == 0) {
         toast.error("Don't have enough credits!");
@@ -572,62 +563,75 @@ const Page = () => {
               ref={scrollRef}
               className={`${
                 currentScrollRef.current + 1 == 3 ? "inp_container_status" : ""
-              } w-[75%] relative  min-w-[300px] inp_containe  overflow-hidden mx-auto h-[80%] bg-[#3f3f3f] rounded-md shadow-xl  border-[5px] border-[#444444]`}
+              } w-[75%] relative min-w-[300px] inp_containe overflow-hidden mx-auto h-[80%] bg-[#3f3f3f] rounded-md shadow-xl border-[5px] border-[#444444]`}
             >
               {/* Phone number input section 1*/}
-              <div className="w-[100%] h-[100%] relative flex flex-col items-center justify-center bg-[#444444]">
-                {/* <div
-                  className="absolute w-fit p-4 bottom-0 hover:bg-[#444444] transition-all active:scale-95 cursor-pointer duration-150 rounded-full right-0"
-                  onClick={() => handleScroll("down")}
-                >
-                  <TbArrowBackUp size={35} className="text-white" />
-                </div> */}
-                <div className="flex w-[100%] flex-col mt-[-20px] flex-wrap items-center  justify-center gap-2 gap-y-5">
-                  <motion.div
-                    initial={{ opacity: 0, y: -20, rotate: -10 }}
-                    animate={{ opacity: 1, y: 0, rotate: 0 }}
-                    transition={{
-                      duration: 0.5,
-                      type: "spring",
-                      stiffness: 120,
-                      damping: 10,
-                    }}
-                    className="relative w-[100%]"
+              <div
+                className={`w-[100%] h-[100%] absolute top-0 left-0 transition-all duration-500 ${
+                  currentScroll >= 1
+                    ? "opacity-0 pointer-events-none"
+                    : "opacity-100"
+                }`}
+              >
+                <div className="w-[100%] h-[100%] relative flex flex-col items-center justify-center bg-[#444444]">
+                  {/* <div
+                    className="absolute w-fit p-4 bottom-0 hover:bg-[#444444] transition-all active:scale-95 cursor-pointer duration-150 rounded-full right-0"
+                    onClick={() => handleScroll("down")}
                   >
-                    <div className="relative  flex items-center gap-[2px]  justify-center">
-                      <PopOverForPrefix />
-                      <Input
-                        ref={inputRef}
-                        type="text"
-                        value={phoneNo}
-                        onChange={handlePhoneNoChange}
-                        className={`${poppins.className} relative box-border text-xl p-4 px-2  pl-3 placeholder:text-xl w-[60%] text-[#3f3f3f] min-w-[200px] bg-[#e2e2e2] max-w-[360px] font-semibold placeholder:text-black placeholder:font-semibold transition-all md:min-w-[300px] md:text-2xl md:p-5 md:pl-3 md:placeholder:text-2xl  md:border-8 duration-150 border-[#767676] border-4   placeholder:opacity-45 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none mx-0 border-l-0 md:border-l-0 rounded-tl-none rounded-bl-none py-0 md:py-0 md:h-[87px] h-[65px]  `}
-                        placeholder="Mobile Number"
-                      />
-                    </div>
-                  </motion.div>
-
-                  {/* Continue button */}
-                  <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4 }}
-                  >
-                    <button
-                      disabled={!isActive}
-                      onClick={handleContinue}
-                      className={`bg-[#e2e2e2] text-[#242424] px-4 py-3 rounded-md hover:bg-opacity-70 transition-all font-bold duration-150 md:px-6 md:py-4 md:text-xl ${
-                        isActive ? "opacity-100" : "opacity-50"
-                      }`}
+                    <TbArrowBackUp size={35} className="text-white" />
+                  </div> */}
+                  <div className="flex w-[100%] flex-col mt-[-20px] flex-wrap items-center  justify-center gap-2 gap-y-5">
+                    <motion.div
+                      initial={{ opacity: 0, y: -20, rotate: -10 }}
+                      animate={{ opacity: 1, y: 0, rotate: 0 }}
+                      transition={{
+                        duration: 0.5,
+                        type: "spring",
+                        stiffness: 120,
+                        damping: 10,
+                      }}
+                      className="relative w-[100%]"
                     >
-                      Continue
-                    </button>
-                  </motion.div>
+                      <div className="relative  flex items-center gap-[2px]  justify-center">
+                        <PopOverForPrefix />
+                        <Input
+                          ref={inputRef}
+                          type="text"
+                          value={phoneNo}
+                          onChange={handlePhoneNoChange}
+                          className={`${poppins.className} relative box-border text-xl p-4 px-2  pl-3 placeholder:text-xl w-[60%] text-[#3f3f3f] min-w-[200px] bg-[#e2e2e2] max-w-[360px] font-semibold placeholder:text-black placeholder:font-semibold transition-all md:min-w-[300px] md:text-2xl md:p-5 md:pl-3 md:placeholder:text-2xl  md:border-8 duration-150 border-[#767676] border-4   placeholder:opacity-45 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none mx-0 border-l-0 md:border-l-0 rounded-tl-none rounded-bl-none py-0 md:py-0 md:h-[87px] h-[65px]  `}
+                          placeholder="Mobile Number"
+                        />
+                      </div>
+                    </motion.div>
+
+                    {/* Continue button */}
+                    <motion.div
+                      initial={{ opacity: 0, y: -20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4 }}
+                    >
+                      <button
+                        disabled={!isActive}
+                        onClick={handleContinue}
+                        className={`bg-[#e2e2e2] text-[#242424] px-4 py-3 rounded-md hover:bg-opacity-70 transition-all font-bold duration-150 md:px-6 md:py-4 md:text-xl ${
+                          isActive ? "opacity-100" : "opacity-50"
+                        }`}
+                      >
+                        Continue
+                      </button>
+                    </motion.div>
+                  </div>
                 </div>
               </div>
-              {/* Verification badge section 2*/}
-              <div className="w-[100%] flex flex-col  relative h-[100%] bg-[#363636]">
-                {/* Audio Carousel */}
+              {/* Audio selection section 2*/}
+              <div
+                className={`w-[100%] h-[100%] absolute top-0 left-0 transition-all duration-500 ${
+                  currentScroll === 1
+                    ? "opacity-100 z-10"
+                    : "opacity-0 pointer-events-none"
+                }`}
+              >
                 <div className="w-[100%] h-[100%] flex-col flex-shrink-0   text-white  flex justify-evenly ">
                   <div className="w-full h-[180px]  m-w-[350px]  flex items-center  justify-center">
                     <AudioUploadCard />
@@ -659,54 +663,62 @@ const Page = () => {
                   <TbArrowBackUp size={25} className="text-white" />
                 </div>
               </div>
-              {/* Status section 3 */}
-              <div className="w-[100%] h-[100%] bg-[#2c2c2c] relative">
+              {/* Status section 3*/}
+              <div
+                className={`w-[100%] h-[100%] absolute top-0 left-0 transition-all duration-500 ${
+                  currentScroll === 2
+                    ? "opacity-100 z-20"
+                    : "opacity-0 pointer-events-none"
+                }`}
+              >
                 <div className="w-[100%] h-[100%] bg-[#2c2c2c] relative">
-                  <div className="w-[100%] h-[100%] flex items-center justify-center">
-                    <p className="text-white text-xl font-semibold flex  flex-col justify-center items-center gap-2">
-                      <Loader2 color={statusColor} />
-                      {status == "recordingUrl" ? (
-                        <>
-                          <RecordAudioPlayer audioFile={recUrl} />
+                  <div className="w-[100%] h-[100%] bg-[#2c2c2c] relative">
+                    <div className="w-[100%] h-[100%] flex items-center justify-center">
+                      <p className="text-white text-xl font-semibold flex  flex-col justify-center items-center gap-2">
+                        <Loader2 color={statusColor} />
+                        {status == "recordingUrl" ? (
+                          <>
+                            <RecordAudioPlayer audioFile={recUrl} />
 
-                          <span className="hidden">
-                            {setTimeout(() => {
-                              perfectScroll();
-                            }, 1000) && null}
-                          </span>
-                        </>
-                      ) : (
-                        <span className="text-white text-3xl font-bold">
-                          {status}
+                            <span className="hidden">
+                              {setTimeout(() => {
+                                perfectScroll();
+                              }, 1000) && null}
+                            </span>
+                          </>
+                        ) : (
+                          <span className="text-white text-3xl font-bold">
+                            {status}
 
-                          <span className="hidden">
-                            {setTimeout(() => {
-                              perfectScroll();
-                            }, 1000) && null}
+                            <span className="hidden">
+                              {setTimeout(() => {
+                                perfectScroll();
+                              }, 1000) && null}
+                            </span>
                           </span>
-                        </span>
-                      )}
-                      {isRestart && (
-                        <>
-                          <VscDebugRestart
-                            onClick={() => {
-                              handleScroll("up");
-                              setIsRestart(false);
-                              setStatus("Calling");
-                              setStatusColor("#b1b1b1");
-                              window.history.replaceState(null, "", `/home`);
-                            }}
-                            size={25}
-                            className="opacity-70 mt-5 cursor-pointer hover:opacity-100 active:scale-90 transition-all duration-150"
-                          />
-                          <span className="hidden">
-                            {setTimeout(() => {
-                              perfectScroll();
-                            }, 1000) && null}
-                          </span>
-                        </>
-                      )}
-                    </p>
+                        )}
+                        {isRestart && (
+                          <>
+                            <VscDebugRestart
+                              onClick={() => {
+                                handleScroll("up");
+                                setIsRestart(false);
+                                setStatus("Calling");
+                                setStatusColor("#b1b1b1");
+                                window.history.replaceState(null, "", `/home`);
+                              }}
+                              size={25}
+                              className="opacity-70 mt-5 cursor-pointer hover:opacity-100 active:scale-90 transition-all duration-150"
+                            />
+                            <span className="hidden">
+                              {setTimeout(() => {
+                                perfectScroll();
+                              }, 1000) && null}
+                            </span>
+                          </>
+                        )}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
