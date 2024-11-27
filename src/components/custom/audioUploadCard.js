@@ -8,10 +8,6 @@ import {
 import { Input } from "../../components/ui/input";
 import { useDispatch, useSelector } from "react-redux";
 import { setAudioFile } from "../../app/redux/slices/audioFile";
-import {
-  setAudioSelected,
-  clearAudioSelected,
-} from "../../app/redux/slices/audioSelected";
 import { setPlayingAudio } from "../../app/redux/slices/playingAudio";
 
 const AudioUploadCard = () => {
@@ -21,12 +17,15 @@ const AudioUploadCard = () => {
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file && file.type === "audio/mpeg") {
+      // Stop and unload current playing audio if exists
+      if (playingAudio) {
+        playingAudio.stop();
+        playingAudio.unload();
+        dispatch(setPlayingAudio(null));
+      }
+
+      // Set the new audio file
       dispatch(setAudioFile(file));
-      dispatch(setAudioSelected(null));
-      playingAudio?.stop();
-      playingAudio?.unload();
-      dispatch(setPlayingAudio(null));
-      dispatch(clearAudioSelected());
       console.log(file);
     } else {
       alert("Please upload an MP3 audio file.");

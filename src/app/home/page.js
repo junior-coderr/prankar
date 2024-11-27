@@ -289,10 +289,10 @@ const Page = () => {
 
     // Handler for continue button
     const handleContinue = () => {
-      // if (!session) {
-      //   toast.error("Please login first!");
-      //   return;
-      // }
+      if (!session) {
+        toast.error("Please login first!");
+        return;
+      }
       // console.log("sssss", creditRef.current.textContent);
       if (creditRef.current?.textContent == 0) {
         toast.error("Don't have enough credits!");
@@ -499,7 +499,6 @@ const Page = () => {
             }, 2000);
           } else if (audioFile != null) {
             // Handle audio file case
-            // Handle audio file case
             const response = await fetch("/api/upload-audio", {
               method: "POST",
               body: formData,
@@ -541,6 +540,7 @@ const Page = () => {
               });
             }, 2000);
           }
+          // Only scroll if upload is successful
           handleScroll("down");
         } catch (error) {
           console.error("Error uploading audio:", error);
