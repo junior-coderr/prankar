@@ -8,27 +8,50 @@ import {
   CarouselPrevious,
 } from "../../components/ui/carousel";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  setAudioSelected,
-  clearAudioSelected,
-} from "../../app/redux/slices/audioSelected";
+import { setAudioSelected } from "../../app/redux/slices/audioSelected";
 import { setPlayingAudio } from "../../app/redux/slices/playingAudio";
 import { Howl } from "howler";
 import Loader from "../custom/loader";
+import { setExternalAudioUnload } from "../../app/redux/slices/ExternalAudioUnload";
 
 const SelectAudioCarousel = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(null);
   const [elemObj, setElemObj] = useState({});
+  const [audioData, setAudioData] = useState([]);
+  const [isAudioFetched, setIsAudioFetched] = useState(false);
 
+  const externalAudioUnload = useSelector(
+    (state) => state.externalAudioUnload.value
+  );
+
+  const audioSelected = useSelector(
+    (state) => state.audioSelected.audioSelected
+  );
   const dispatch = useDispatch();
   const playingAudio = useSelector((state) => state.playingAudio.value);
 
-  const tempUrl =
-    "https://webnew.blob.core.windows.net/audio/keyboard-typing-5997.mp3";
+  // const tempUrl =
+  //   "https://webnew.blob.core.windows.net/audio/keyboard-typing-5997.mp3";
 
-  const handleAudioClick = async (index) => {
+  useEffect(() => {
+    const fetchAudio = async () => {
+      try {
+        const response = await fetch("/api/audio/default");
+        let audioData = await response.json();
+        setIsAudioFetched(true);
+        console.log("audioData", audioData.audio);
+        setAudioData(audioData.audio);
+      } catch (error) {
+        console.error("Error fetching audio:", error);
+      }
+    };
+
+    fetchAudio();
+  }, []);
+
+  const handleAudioClick = async (index, audio) => {
     if (isLoading) return;
     setIsLoading(true);
     if (playingAudio) {
@@ -40,7 +63,7 @@ const SelectAudioCarousel = () => {
     setElemObj((prev) => ({
       ...prev,
       [currentIndex]: {
-        ...prev[currentIndex],
+        // ...prev[currentIndex],
         isPlaying: false,
         isLoading: false,
       },
@@ -56,7 +79,8 @@ const SelectAudioCarousel = () => {
 
     // if (playingAudio != null) return;
     dispatch(setAudioSelected(index));
-    setIsLoading(true);
+
+    // setIsLoading(true);
     setElemObj((prev) => ({
       ...prev,
       [index]: {
@@ -65,14 +89,14 @@ const SelectAudioCarousel = () => {
       },
     }));
     const sound = new Howl({
-      src: [tempUrl],
-      autoplay: true,
+      src: [audio],
+      autoplay: false,
       volume: 0.5,
       onplay: () => {
         setElemObj((prev) => ({
           ...prev,
           [index]: {
-            ...prev[index],
+            isLoading: false,
             isPlaying: true,
           },
         }));
@@ -81,88 +105,103 @@ const SelectAudioCarousel = () => {
         setElemObj((prev) => ({
           ...prev,
           [index]: {
-            ...prev[index],
             isPlaying: false,
           },
         }));
       },
       onload: () => {
+        // console.log("externalAudioUnload", externalAudioUnloadEffect);
         setIsLoading(false);
         setElemObj((prev) => ({
           ...prev,
           [index]: {
-            ...prev[index],
             isLoading: false,
             isPlaying: true,
           },
         }));
+        console.log("externalAudioUnload in load call", externalAudioUnload);
+        if (externalAudioUnload) {
+          console.log("setting externalAudioUnload to false");
+          dispatch(setExternalAudioUnload(false));
+        } else {
+          sound.play(); // Play only after it's loaded
+        }
         setIsLoading(false);
       },
-      onpause: () => {
-        setElemObj((prev) => ({
-          ...prev,
-          [index]: {
-            ...prev[index],
-            isPlaying: false,
-          },
-        }));
+      onstop: () => {
         setIsLoading(false);
       },
     });
     setCurrentIndex(index);
     dispatch(setAudioSelected(index));
     dispatch(setPlayingAudio(sound));
-    sound.play();
   };
   return (
     <Carousel className="w-full  h-[50%]">
       <CarouselContent className=" h-full">
         {/* h-[calc(55vh)] */}
-        <CarouselItem
-          className="flex-shrink-0 w-full font-medium h-[100%] mx-auto grid-cols-2 sm:grid-cols-3 gap-y-5 px-5 overflow-y-auto place-items-center "
-          style={{
-            display: "grid",
-            // gridTemplateColumns: " repeat(2, 1fr)",
-            gridAutoRows: "1fr",
-          }}
-        >
-          {Array.from({ length: 20 }).map((_, index) => {
-            // Initialize the element object only once
-            if (!(index in elemObj)) {
-              setElemObj((prev) => ({
-                ...prev,
-                [index]: {
-                  isLoading: false,
-                  isPlaying: false,
-                },
-              }));
-            }
-            return (
-              <div
-                key={index}
-                className={`text-center bg-[#e5e5e5] rounded-lg p-5 w-32  text-black hover:opacity-85 transition-all relative  cursor-pointer ${
-                  elemObj[index]?.isPlaying ? "border-4 border-[#25b09b]" : ""
-                }`}
-                onClick={() => {
-                  handleAudioClick(index);
-                }}
-                disabled={elemObj[index]?.isLoading}
-              >
-                {elemObj[index]?.isLoading ? (
-                  <div className="flex items-center justify-center scale-50">
-                    <Loader className="mx-auto" />
+        <CarouselItem className="w-full">
+          <div className="pl-10 text-center  text-xl font-medium w-full">
+            Hindi
+          </div>
+          <div
+            className="flex-shrink-0 w-full font-medium h-[100%] mx-auto grid-cols-2 sm:grid-cols-3 gap-y-5 px-5 overflow-y-auto place-items-center pb-10"
+            style={{
+              display: "grid",
+              gridAutoRows: "1fr",
+              gridAutoColumns: "1fr",
+            }}
+          >
+            {audioData?.length > 0 ? (
+              audioData.map((audio, index) => {
+                // Initialize the element object only once
+                if (!(index in elemObj)) {
+                  setElemObj((prev) => ({
+                    ...prev,
+                    [index]: {
+                      isLoading: false,
+                      isPlaying: false,
+                    },
+                  }));
+                }
+                return (
+                  <div key={index} className="">
+                    <div
+                      className={`text-center bg-[#e5e5e5] rounded-lg p-3 w-28  text-black hover:opacity-85 transition-all relative  cursor-pointer  ${
+                        elemObj[index]?.isPlaying && audioSelected == index
+                          ? "border-4 border-[#25b09b]"
+                          : ""
+                      }`}
+                      onClick={() => {
+                        handleAudioClick(index, audio);
+                      }}
+                      disabled={elemObj[index]?.isLoading}
+                    >
+                      {elemObj[index]?.isLoading ? (
+                        <div className="flex items-center justify-center scale-50">
+                          <Loader className="mx-auto" />
+                        </div>
+                      ) : (
+                        <span className="text-center relative">
+                          {/* {audio.slice(0, 10)} */}
+                          Audio {index + 1}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                ) : (
-                  <span className="text-center relative">
-                    Audio {index + 1}
-                  </span>
-                )}
+                );
+              })
+            ) : (
+              <div className="flex items-center absolute justify-center w-full mx-auto">
+                <Loader className="mx-auto" />
               </div>
-            );
-          })}
+            )}
+          </div>
         </CarouselItem>
-        <CarouselItem className="flex-shrink-0 w-full">Audio 2</CarouselItem>
-        <CarouselItem className="flex-shrink-0 w-full">Audio 3</CarouselItem>
+        <CarouselItem className="flex-shrink-0 w-full p">
+          English - Coming soon
+        </CarouselItem>
+        {/* <CarouselItem className="flex-shrink-0 w-full">Audio 3</CarouselItem> */}
       </CarouselContent>
       <CarouselPrevious className="left-3  cursor-pointer text-black active:scale-90 duration-150" />
       <CarouselNext className="right-3  cursor-pointer text-black active:scale-90 duration-150" />

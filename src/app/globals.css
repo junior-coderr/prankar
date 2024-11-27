@@ -66,9 +66,39 @@
   }
 }
 
+.rhap_container {
+  background-color: #333 !important;
+  border-radius: 10px;
+  width: 250px !important;
+  box-shadow: none !important;
+  border: 4px solid #444444 !important;
+}
+/* .rhap_main-controls-button,
+.rhap_controls-section p,
+.rhap_volume-controls,
+.rhap_progress-section {
+  color: #fff !important;
+} */
+.rhap_main-controls-button {
+  color: #fff !important;
+}
+
+.rhap_current-time,
+.rhap_total-time {
+  color: #fff !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+}
+
+.rhap_progress-indicator {
+  background-color: #444444 !important; /* Customize progress bar */
+  box-shadow: none !important;
+}
+
 .inp_container {
   scrollbar-width: none;
   -ms-overflow-style: none;
+  position: relative;
 }
 
 .inp_container::-webkit-scrollbar {
@@ -80,7 +110,6 @@
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.139), 0 0 100px #6b6b6b;
 }
 
-/* HTML: <div class="loader"></div> */
 .loader {
   width: 50px;
   aspect-ratio: 1;
@@ -107,4 +136,126 @@
   100% {
     transform: rotate(1turn);
   }
+}
+
+.loader2 {
+  width: 68px;
+  height: 68px;
+  display: inline-block;
+  position: relative;
+}
+.loader2::after,
+.loader2::before {
+  content: "";
+  box-sizing: border-box;
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  animation: animloader 2s linear infinite;
+  background: var(--color);
+}
+.loader2::after {
+  animation-delay: 1s;
+}
+
+@keyframes animloader {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+.loader3 {
+  width: 25px;
+  height: 25px;
+  border: 5px solid #25b09b;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 0.6s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.paytoneOne {
+  font-family: "Paytone One", sans-serif;
+}
+
+/* Hide the close icon in AlertDialogContent */
+.absolute.right-4.top-4.rounded-sm.opacity-70 {
+  display: none;
+}
+
+/* Add these styles for slide transitions */
+.inp_containe > div {
+  transform-origin: center center;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.inp_containe > div.opacity-0 {
+  transform: scale(0.95);
+}
+
+.inp_containe > div.opacity-100 {
+  transform: scale(1);
+}
+
+/* Add these new styles for the audio selection UI */
+.audio-selection-container {
+  background: linear-gradient(145deg, #3a3a3a, #2c2c2c);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Update the carousel styling */
+.carousel-container {
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Style for audio cards */
+.audio-card {
+  background: linear-gradient(145deg, #404040, #363636);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.audio-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Enhance button styles */
+.gradient-button {
+  background: linear-gradient(145deg, #4a4a4a, #3a3a3a);
+  transition: all 0.3s ease;
+}
+
+.gradient-button:hover:not(:disabled) {
+  background: linear-gradient(145deg, #555555, #444444);
+  transform: translateY(-1px);
+}
+
+.gradient-button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* Add smooth transitions */
+.transition-smooth {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }

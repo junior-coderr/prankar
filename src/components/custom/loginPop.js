@@ -13,10 +13,10 @@ import { signIn } from "next-auth/react";
 
 export default function LoginPop() {
   return (
-    <Dialog>
+    <Dialog className="">
       <DialogTrigger asChild>
         <div className="flex gap-1 justify-center items-center">
-          <GoPerson size={24} /> <span className={``}>login</span>
+          <GoPerson size={24} /> <span className={``}>Login</span>
         </div>
       </DialogTrigger>
       <DialogContent className="w-[260px] bg-[#2F322F] rounded-md border-[1px] border-[#3f3f3f] text-white outline-none border-none">
