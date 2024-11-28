@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -13,6 +13,14 @@ import { setPlayingAudio } from "../../app/redux/slices/playingAudio";
 const AudioUploadCard = () => {
   const dispatch = useDispatch();
   const playingAudio = useSelector((state) => state.playingAudio.value);
+  const persistedState = useSelector((state) => state.persistedState);
+
+  // Add useEffect to initialize from persisted state
+  useEffect(() => {
+    if (persistedState.customAudioFile) {
+      dispatch(setAudioFile(persistedState.customAudioFile));
+    }
+  }, []);
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];

@@ -31,9 +31,7 @@ const SelectAudioCarousel = () => {
   );
   const dispatch = useDispatch();
   const playingAudio = useSelector((state) => state.playingAudio.value);
-
-  // const tempUrl =
-  //   "https://webnew.blob.core.windows.net/audio/keyboard-typing-5997.mp3";
+  const persistedState = useSelector((state) => state.persistedState);
 
   useEffect(() => {
     const fetchAudio = async () => {
@@ -49,6 +47,12 @@ const SelectAudioCarousel = () => {
     };
 
     fetchAudio();
+  }, []);
+
+  useEffect(() => {
+    if (persistedState.selectedAudioIndex !== null) {
+      dispatch(setAudioSelected(persistedState.selectedAudioIndex));
+    }
   }, []);
 
   const handleAudioClick = async (index, audio) => {

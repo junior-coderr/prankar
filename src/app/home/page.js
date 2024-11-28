@@ -29,6 +29,16 @@ import getCredits from "app/utils/client/getCredits";
 import TermsAndConditions from "app/utils/client/termsAndComditions";
 import { FaArrowRight } from "react-icons/fa6";
 import TermsACPopup from "../../components/custom/termsAC";
+import { setCurrentScroll } from "../../app/redux/slices/pageState";
+import {
+  setPersistedPhoneNumber,
+  setPersistedPrefix,
+  setPersistedSelectedAudioIndex,
+  setPersistedCustomAudioFile,
+  setPersistedCurrentPage,
+} from "../../app/redux/slices/persistedState";
+import { setAudioFile } from "../../app/redux/slices/audioFile";
+import { setAudioSelected } from "../../app/redux/slices/audioSelected";
 
 import { Poppins } from "next/font/google";
 const poppins = Poppins({
@@ -181,8 +191,6 @@ const Page = () => {
   const Content = () => {
     const inputRef = useRef(null);
     const scrollRef = useRef(null);
-    const [currentScroll, setCurrentScroll] = useState(0);
-    const currentScrollRef = useRef(0);
     const [isActive, setIsActive] = useState(false);
     const audioSelected = useSelector(
       (state) => state.audioSelected.audioSelected
@@ -203,6 +211,43 @@ const Page = () => {
     const phoneNo = useSelector((state) => state.phoneNoInput.value);
     const router = useRouter();
     const searchParams = useSearchParams(); // Get the query parameters
+    const currentScroll = useSelector((state) => state.pageState.currentScroll);
+
+    // Get persisted state
+    const persistedState = useSelector((state) => state.persistedState);
+
+    // Initialize states from persisted state
+    useEffect(() => {
+      if (persistedState.phoneNumber) {
+        dispatch(setPhoneNo(persistedState.phoneNumber));
+      }
+      if (persistedState.prefix) {
+        dispatch(setPrefix(persistedState.prefix));
+      }
+      if (persistedState.selectedAudioIndex !== null) {
+        dispatch(setAudioSelected(persistedState.selectedAudioIndex));
+      }
+      if (persistedState.customAudioFile) {
+        dispatch(setAudioFile(persistedState.customAudioFile));
+      }
+    }, []);
+
+    // Update persisted state when values change
+    useEffect(() => {
+      dispatch(setPersistedPhoneNumber(phoneNo));
+    }, [phoneNo]);
+
+    useEffect(() => {
+      dispatch(setPersistedPrefix(prefix));
+    }, [prefix]);
+
+    useEffect(() => {
+      dispatch(setPersistedSelectedAudioIndex(audioSelected));
+    }, [audioSelected]);
+
+    useEffect(() => {
+      dispatch(setPersistedCustomAudioFile(audioFile));
+    }, [audioFile]);
 
     // Handler for phone number input change
     const handlePhoneNoChange = (e) => {
@@ -229,7 +274,7 @@ const Page = () => {
 
     // Handler for scrolling
     const handleScroll = (type) => {
-      let newScroll = currentScrollRef.current;
+      let newScroll = currentScroll;
 
       if (type === "up") {
         newScroll = Math.max(0, newScroll - 1);
@@ -237,8 +282,7 @@ const Page = () => {
         newScroll = Math.min(2, newScroll + 1);
       }
 
-      currentScrollRef.current = newScroll;
-      setCurrentScroll(newScroll);
+      dispatch(setCurrentScroll(newScroll));
     };
 
     function perfectScroll() {
@@ -250,7 +294,7 @@ const Page = () => {
         // Check if the height has changed
         if (scrollHeight !== clientHeight) {
           scrollRef.current.scrollTo({
-            top: (scrollHeight / 3) * currentScrollRef.current,
+            top: (scrollHeight / 3) * currentScroll,
             behavior: "smooth",
           });
         }
@@ -268,7 +312,7 @@ const Page = () => {
             // Check if the height has changed
             if (scrollHeight !== clientHeight) {
               scrollRef.current.scrollTo({
-                top: (scrollHeight / 3) * currentScrollRef.current,
+                top: (scrollHeight / 3) * currentScroll,
                 behavior: "smooth",
               });
             }
@@ -317,9 +361,7 @@ const Page = () => {
           for (let entry of entries) {
             if (entry.target === scrollRef.current) {
               scrollRef.current.scrollTo({
-                top:
-                  (scrollRef.current.scrollHeight / 3) *
-                  currentScrollRef.current,
+                top: (scrollRef.current.scrollHeight / 3) * currentScroll,
                 behavior: "smooth",
               });
             }
@@ -562,7 +604,7 @@ const Page = () => {
             <div
               ref={scrollRef}
               className={`${
-                currentScrollRef.current + 1 == 3 ? "inp_container_status" : ""
+                currentScroll + 1 == 3 ? "inp_container_status" : ""
               } w-[75%] relative min-w-[300px] inp_containe overflow-hidden mx-auto h-[80%] bg-[#3f3f3f] rounded-md shadow-xl border-[5px] border-[#444444]`}
             >
               {/* Phone number input section 1*/}
