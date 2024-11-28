@@ -74,17 +74,36 @@ export default async function customAudioUpload(
       }
 
       // Azure Blob Upload
-      const blobServiceClient = BlobServiceClient.fromConnectionString(
-        process.env.BLOB_C_String
-      );
-      const containerName = type === "general" ? "audio" : "call-recording";
+      const connectionString = process.env.BLOB_C_STRING; // Changed from BLOB_C_String to BLOB_C_STRING
+      console.log("Environment variables:", {
+        hasBlobString: !!process.env.BLOB_C_STRING,
+        blobStringLength: process.env.BLOB_C_STRING?.length,
+      });
 
+      if (!connectionString) {
+        throw new Error("Azure Storage connection string is not configured");
+      }
+
+      const blobServiceClient =
+        BlobServiceClient.fromConnectionString(connectionString);
+
+      if (!blobServiceClient) {
+        throw new Error("Failed to create Azure Blob Service client");
+      }
+
+      const containerName = type === "general" ? "audio" : "call-recording";
       const containerClient =
         blobServiceClient.getContainerClient(containerName);
-      const containerExists = await containerClient.exists();
 
-      if (!containerExists) {
-        await containerClient.create();
+      try {
+        const containerExists = await containerClient.exists();
+        if (!containerExists) {
+          await containerClient.create();
+        }
+      } catch (error) {
+        throw new Error(
+          `Failed to access or create container: ${error.message}`
+        );
       }
 
       // Use either the provided audioFile name or generate a unique name for "flex"
