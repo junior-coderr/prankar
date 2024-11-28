@@ -55,6 +55,32 @@ const SelectAudioCarousel = () => {
     }
   }, []);
 
+  // Add this useEffect to handle persisted audio selection
+  useEffect(() => {
+    if (audioSelected !== null && audioData.length > 0) {
+      // Set the element object state for the persisted selection
+      setElemObj((prev) => ({
+        ...prev,
+        [audioSelected]: {
+          isLoading: false,
+          isPlaying: true,
+        },
+      }));
+
+      // Create and set up the audio for the persisted selection
+      const sound = new Howl({
+        src: [audioData[audioSelected]],
+        autoplay: false,
+        volume: 0.5,
+        onload: () => {
+          setIsLoading(false);
+          dispatch(setPlayingAudio(sound));
+        },
+      });
+      setCurrentIndex(audioSelected);
+    }
+  }, [audioSelected, audioData]);
+
   const handleAudioClick = async (index, audio) => {
     if (isLoading) return;
     setIsLoading(true);

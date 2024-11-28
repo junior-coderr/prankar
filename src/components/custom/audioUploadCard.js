@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   Card,
   CardContent,
@@ -14,13 +14,20 @@ const AudioUploadCard = () => {
   const dispatch = useDispatch();
   const playingAudio = useSelector((state) => state.playingAudio.value);
   const persistedState = useSelector((state) => state.persistedState);
+  const audioFile = useSelector((state) => state.audioFile.audioFile);
+  const inputRef = useRef(null);
 
-  // Add useEffect to initialize from persisted state
+  // Effect to initialize from persisted state
   useEffect(() => {
-    if (persistedState.customAudioFile) {
-      dispatch(setAudioFile(persistedState.customAudioFile));
+    if (persistedState.customAudioFile && inputRef.current) {
+      // Create a new DataTransfer object
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(persistedState.customAudioFile);
+
+      // Set the files property of the input element
+      inputRef.current.files = dataTransfer.files;
     }
-  }, []);
+  }, [persistedState.customAudioFile]);
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -51,6 +58,7 @@ const AudioUploadCard = () => {
       <CardContent>
         <div className="grid w-full max-w-sm items-center gap-1.5">
           <Input
+            ref={inputRef}
             type="file"
             accept={["audio/mp3", "audio/wav"]}
             onChange={handleFileChange}

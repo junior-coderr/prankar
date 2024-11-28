@@ -227,9 +227,6 @@ const Page = () => {
       if (persistedState.selectedAudioIndex !== null) {
         dispatch(setAudioSelected(persistedState.selectedAudioIndex));
       }
-      if (persistedState.customAudioFile) {
-        dispatch(setAudioFile(persistedState.customAudioFile));
-      }
     }, []);
 
     // Update persisted state when values change
