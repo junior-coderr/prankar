@@ -55,7 +55,7 @@ const SelectAudioCarousel = () => {
     }
   }, []);
 
-  // Add this useEffect to handle persisted audio selection
+  // Modify this useEffect to properly handle persisted audio selection
   useEffect(() => {
     if (audioSelected !== null && audioData.length > 0) {
       // Set the element object state for the persisted selection
@@ -67,57 +67,89 @@ const SelectAudioCarousel = () => {
         },
       }));
 
-      // Create and set up the audio for the persisted selection
-      const sound = new Howl({
-        src: [audioData[audioSelected]],
-        autoplay: false,
-        volume: 0.5,
-        onload: () => {
-          setIsLoading(false);
-          dispatch(setPlayingAudio(sound));
-        },
-      });
-      setCurrentIndex(audioSelected);
+      // Only create new Howl instance if there isn't one already playing
+      if (!playingAudio) {
+        const sound = new Howl({
+          src: [audioData[audioSelected]],
+          autoplay: false,
+          volume: 0.5,
+          onload: () => {
+            setIsLoading(false);
+            dispatch(setPlayingAudio(sound));
+          },
+          onstop: () => {
+            setIsLoading(false);
+            setElemObj((prev) => ({
+              ...prev,
+              [audioSelected]: {
+                isLoading: false,
+                isPlaying: false,
+              },
+            }));
+          },
+        });
+        setCurrentIndex(audioSelected);
+      }
     }
   }, [audioSelected, audioData]);
 
   const handleAudioClick = async (index, audio) => {
     if (isLoading) return;
     setIsLoading(true);
-    if (playingAudio) {
-      playingAudio.stop();
-      await playingAudio.unload();
-      dispatch(setPlayingAudio(null));
-      dispatch(setAudioSelected(null));
-    }
-    setElemObj((prev) => ({
-      ...prev,
-      [currentIndex]: {
-        // ...prev[currentIndex],
-        isPlaying: false,
-        isLoading: false,
-      },
-    }));
 
-    if (index == currentIndex) {
+    // If clicking the same audio that's currently selected
+    if (index === currentIndex) {
+      if (playingAudio) {
+        playingAudio.stop();
+        await playingAudio.unload();
+        dispatch(setPlayingAudio(null));
+      }
       dispatch(setAudioSelected(null));
-      dispatch(setPlayingAudio(null));
-      setIsLoading(false);
       setCurrentIndex(null);
+      setElemObj((prev) => ({
+        ...prev,
+        [index]: {
+          isLoading: false,
+          isPlaying: false,
+        },
+      }));
+      setIsLoading(false);
       return;
     }
 
-    // if (playingAudio != null) return;
-    dispatch(setAudioSelected(index));
+    // First, stop any currently playing audio
+    if (playingAudio) {
+      // Check if the audio is actually loaded before trying to stop it
+      if (playingAudio.state() === "loaded") {
+        playingAudio.stop();
+        await playingAudio.unload();
+      }
+      dispatch(setPlayingAudio(null));
+      dispatch(setAudioSelected(null));
+    }
 
-    // setIsLoading(true);
+    // Reset all audio states
+    setElemObj((prev) => {
+      const newState = { ...prev };
+      Object.keys(newState).forEach((key) => {
+        newState[key] = {
+          isLoading: false,
+          isPlaying: false,
+        };
+      });
+      return newState;
+    });
+
+    // Set loading state for clicked audio
     setElemObj((prev) => ({
       ...prev,
       [index]: {
-        ...prev[index],
         isLoading: true,
+        isPlaying: false,
       },
     }));
+
+    // Create new audio instance
     const sound = new Howl({
       src: [audio],
       autoplay: false,
@@ -135,43 +167,45 @@ const SelectAudioCarousel = () => {
         setElemObj((prev) => ({
           ...prev,
           [index]: {
+            isLoading: false,
             isPlaying: false,
           },
         }));
       },
       onload: () => {
-        // console.log("externalAudioUnload", externalAudioUnloadEffect);
+        setIsLoading(false);
+        if (externalAudioUnload) {
+          dispatch(setExternalAudioUnload(false));
+        } else {
+          sound.play();
+        }
+      },
+      onstop: () => {
         setIsLoading(false);
         setElemObj((prev) => ({
           ...prev,
           [index]: {
             isLoading: false,
-            isPlaying: true,
+            isPlaying: false,
           },
         }));
-        console.log("externalAudioUnload in load call", externalAudioUnload);
-        if (externalAudioUnload) {
-          console.log("setting externalAudioUnload to false");
-          dispatch(setExternalAudioUnload(false));
-        } else {
-          sound.play(); // Play only after it's loaded
-        }
-        setIsLoading(false);
-      },
-      onstop: () => {
-        setIsLoading(false);
       },
     });
+
     setCurrentIndex(index);
     dispatch(setAudioSelected(index));
     dispatch(setPlayingAudio(sound));
   };
+
   return (
     <Carousel className="w-full  h-[50%]">
       <CarouselContent className=" h-full">
         {/* h-[calc(55vh)] */}
         <CarouselItem className="w-full">
-          <div className="pl-10 text-center  text-xl font-medium w-full">
+          <div
+            className="px-5 font-bold text-xl w-full"
+            style={{ textAlign: "center" }}
+          >
             Hindi
           </div>
           <div

@@ -1,3 +1,5 @@
+"use client";
+import { useState, useEffect } from "react";
 import LetterPullup from "../components/magicui/letter-pullup";
 import ShinyButton from "../components/magicui/shiny-button";
 import * as motion from "framer-motion/client";
@@ -13,14 +15,21 @@ export default function Home() {
   async function HeadText() {
     return (
       <>
-        <div className="flex flex-col text-[2.8rem] md:text-7xl select-none leading-[2.8rem] md:leading-[2rem]">
+        <div className="flex flex-col text-[2.8rem] md:text-7xl select-none leading-[2.8rem] md:leading-[4.5rem]">
           <LetterPullup
             className={"text-white tracking-[0.02em]"}
             words={"Live LONG"}
             delay={0.03}
           />
           <LetterPullup
-            className={"text-white tracking-[0.02em]"}
+            className={
+              "text-white tracking-[0.00em] text-[1.5rem] md:text-4xl -my-2"
+            }
+            words={"&"}
+            delay={0.03}
+          />
+          <LetterPullup
+            className={"text-white tracking-[0.02em] -mt-1"}
             words={"DIE Laughing"}
             delay={0.03}
           />
@@ -34,7 +43,7 @@ export default function Home() {
     return (
       <ShinyButton
         text="CONTINUE"
-        className="bg-white p-2 px-4 text-base text-[#1a1a1a]"
+        className="bg-white p-3 px-6 text-lg text-[#1a1a1a]"
       />
     );
   }
@@ -67,6 +76,51 @@ export default function Home() {
   }
 
   // ===== Component Definitions =====
+
+  function TypewriterText({ text }) {
+    const [displayText, setDisplayText] = useState("");
+    const [isTyping, setIsTyping] = useState(false);
+
+    useEffect(() => {
+      let currentIndex = 0;
+      let timeoutId;
+
+      const typeNextCharacter = () => {
+        if (currentIndex === 0) {
+          setIsTyping(true);
+        }
+
+        if (currentIndex < text.length) {
+          setDisplayText(text.slice(0, currentIndex + 1));
+          currentIndex++;
+
+          // Even faster typing with minimal pauses
+          const delay = text[currentIndex - 1]?.match(/[.,!?]/) ? 100 : 20;
+          timeoutId = setTimeout(typeNextCharacter, delay);
+        } else {
+          setTimeout(() => setIsTyping(false), 200);
+        }
+      };
+
+      timeoutId = setTimeout(typeNextCharacter, 100); // Shorter initial delay
+
+      return () => clearTimeout(timeoutId);
+    }, [text]);
+
+    return (
+      <p className="text-center text-gray-300 text-base md:text-lg mb-4 max-w-[300px] mx-auto font-sans tracking-wide relative">
+        {displayText}
+        {isTyping && (
+          <span
+            className="inline-block w-[2px] h-[1em] bg-gray-300 ml-1 align-middle animate-blink"
+            style={{
+              animation: "blink 1s step-end infinite",
+            }}
+          />
+        )}
+      </p>
+    );
+  }
 
   return (
     <>
@@ -105,6 +159,9 @@ export default function Home() {
             {/* Container component, likely for a featured element */}
             <Container />
             <br />
+
+            {/* Description text */}
+            <TypewriterText text="🎭 Prank smarter—send calls with your own audio from a third-party number! 📞😂" />
 
             {/* Wrapper for the action button */}
             <div className="flex">

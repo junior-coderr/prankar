@@ -359,7 +359,6 @@ const Page = () => {
             if (entry.target === scrollRef.current) {
               scrollRef.current.scrollTo({
                 top: (scrollRef.current.scrollHeight / 3) * currentScroll,
-                behavior: "smooth",
               });
             }
           }
@@ -629,9 +628,12 @@ const Page = () => {
                         stiffness: 120,
                         damping: 10,
                       }}
-                      className="relative w-[100%]"
+                      className="relative w-[100%] flex flex-col items-center"
                     >
-                      <div className="relative  flex items-center gap-[2px]  justify-center">
+                      <label className="block text-white text-right mb-2 text-lg w-[60%] max-w-[360px]">
+                        Recipient&apos;s number
+                      </label>
+                      <div className="relative flex items-center gap-[2px] justify-center">
                         <PopOverForPrefix />
                         <Input
                           ref={inputRef}
@@ -671,15 +673,24 @@ const Page = () => {
                     : "opacity-0 pointer-events-none"
                 }`}
               >
-                <div className="w-[100%] h-[100%] flex-col flex-shrink-0   text-white  flex justify-evenly ">
+                <div className="w-[100%] h-[100%] flex-col flex-shrink-0   text-white  flex justify-evenly relative">
                   <div className="w-full h-[180px]  m-w-[350px]  flex items-center  justify-center">
                     <AudioUploadCard />
                   </div>
                   <SelectAudioCarousel />
-                  <div className="relative flex items-center justify-end w-full   h-10 select-none   text-black ">
+                  <div className="relative flex items-center justify-between w-full   h-10 select-none   text-black px-4">
                     {/* <TbArrowBackUp size={35} className="text-white" /> */}
+                    <div
+                      className="p-2 py-1 hover:bg-[#444444] font-semibold transition-all active:scale-95 cursor-pointer duration-150 rounded-full"
+                      onClick={() => {
+                        handleScroll("up");
+                        handleScroll("up");
+                      }}
+                    >
+                      <TbArrowBackUp size={25} className="text-white" />
+                    </div>
                     <button
-                      className={`font-semibold bg-white flex items-center justify-center m-4 p-3 transition-all w-28 active:scale-90 cursor-pointer duration-150 rounded-sm  shadow-lg ${
+                      className={`font-semibold bg-white flex items-center justify-center p-3 transition-all w-28 active:scale-90 cursor-pointer duration-150 rounded-sm  shadow-lg ${
                         audioFile != null || audioSelected != null
                           ? "opacity-100"
                           : "opacity-50 cursor-not-allowed"
@@ -690,16 +701,6 @@ const Page = () => {
                       {isLoading ? <Loader3 /> : "Set Audio"}
                     </button>
                   </div>
-                </div>
-
-                <div
-                  className="absolute w-fit  p-2 py-1 top-0 hover:bg-[#444444] font-semibold transition-all active:scale-95 cursor-pointer duration-150 rounded-full right-0"
-                  onClick={() => {
-                    handleScroll("up");
-                    handleScroll("up");
-                  }}
-                >
-                  <TbArrowBackUp size={25} className="text-white" />
                 </div>
               </div>
               {/* Status section 3*/}
