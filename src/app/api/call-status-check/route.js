@@ -4,7 +4,7 @@ export async function GET(request) {
   let uniqueId = null;
   const url = new URL(request.url);
   const sid = url.searchParams.get("sid");
-  console.log("sid", sid);
+  // console.log("sid", sid);
 
   const sharedStream = new ReadableStream({
     start(controller) {
@@ -21,11 +21,11 @@ export async function GET(request) {
           );
 
           if (!dbData) {
-            console.log("No data found");
+            // console.log("No data found");
             if (controller) {
               controller.close();
               clearInterval(interval);
-              console.log("Interval cleared");
+              // console.log("Interval cleared");
             }
             return;
           }
@@ -36,10 +36,10 @@ export async function GET(request) {
             timestamp: new Date().toISOString(),
           });
           controller.enqueue(`data: ${data}\n\n`);
-          console.log("Pushed data:", data);
+          // console.log("Pushed data:", data);
           // Continue sending data every second
 
-          console.log("dbData.status", dbData?.status);
+          // console.log("dbData.status", dbData?.status);
           if (!dbData?.status) {
             return;
           }
@@ -51,11 +51,11 @@ export async function GET(request) {
             setTimeout(() => {
               if (interval) {
                 clearInterval(interval);
-                console.log("Interval cleared");
+                // console.log("Interval cleared");
               }
               if (controller) {
                 controller.close();
-                console.log("Controller closed");
+                // console.log("Controller closed");
               }
               isSetTimeout = false;
               // return;
@@ -74,22 +74,22 @@ export async function GET(request) {
             setTimeout(() => {
               if (interval) {
                 clearInterval(interval);
-                console.log("Interval cleared");
+                // console.log("Interval cleared");
               }
               if (controller) {
                 controller.close();
-                console.log("Controller closed");
+                // console.log("Controller closed");
               }
               isBusy = false;
               // clearInterval(interval);
-              console.log("Interval cleared");
+              // console.log("Interval cleared");
               // isBusy = false;
             }, 6000);
           } else {
             if (controller) {
               controller.close();
               clearInterval(interval);
-              console.log("Interval cleared");
+              // console.log("Interval cleared");
             }
           }
         } catch (error) {
@@ -97,7 +97,7 @@ export async function GET(request) {
           if (controller) {
             controller.close();
             clearInterval(interval);
-            console.log("Interval cleared by catch");
+            // console.log("Interval cleared by catch");
             controller.error(error);
           }
         }

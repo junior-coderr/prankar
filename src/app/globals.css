@@ -206,6 +206,10 @@
   font-family: "Paytone One", sans-serif;
 }
 
+.font-poppins {
+  font-family: var(--font-poppins);
+}
+
 /* Hide the close icon in AlertDialogContent */
 .absolute.right-4.top-4.rounded-sm.opacity-70 {
   display: none;

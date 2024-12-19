@@ -29,7 +29,7 @@ const SmileRandom = () => {
   }, []);
 
   useEffect(() => {
-    console.log(size);
+    // console.log(size);
   }, [size]);
 
   return (

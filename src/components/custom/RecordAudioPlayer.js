@@ -7,7 +7,7 @@ import { Skeleton } from "../ui/skeleton";
 const RecordAudioPlayer = ({ audioFile }) => {
   const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
-    console.log(isLoading);
+    // console.log(isLoading);
   }, [isLoading]);
   return (
     <div className="relative w-[75%] flex flex-col justify-center items-center min-w-[300px] h-[120px]">
@@ -25,11 +25,11 @@ const RecordAudioPlayer = ({ audioFile }) => {
         src={audioFile}
         onLoadedMetadata={() => {
           setIsLoading(false); // Stop loading when metadata is loaded
-          console.log("Metadata loaded");
+          // console.log("Metadata loaded");
         }}
         onCanPlay={() => {
           setIsLoading(false); // Stop loading when the audio can play
-          console.log("Audio can play");
+          // console.log("Audio can play");
         }}
         autoPlay={true}
         customAdditionalControls={[]}

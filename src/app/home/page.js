@@ -39,27 +39,26 @@ import {
 } from "../../app/redux/slices/persistedState";
 import { setAudioFile } from "../../app/redux/slices/audioFile";
 import { setAudioSelected } from "../../app/redux/slices/audioSelected";
+import { setCredits, setCreditsLoading } from "../../app/redux/slices/credits";
 
-import { Poppins } from "next/font/google";
-const poppins = Poppins({
-  weight: ["400", "700"],
-  subsets: ["latin"],
-});
 import { VscDebugRestart } from "react-icons/vsc";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { usePathname, useSearchParams } from "next/navigation";
+import { FaCopy } from "react-icons/fa";
+import { IoIosSend } from "react-icons/io";
+import { IoMusicalNotes } from "react-icons/io5";
+import { FaCoins } from "react-icons/fa";
+import { BsPiggyBank } from "react-icons/bs";
+import { IoMdHelpCircle } from "react-icons/io"; // Add this import
 
 // Main Page Component
 const Page = () => {
   const [isMobile, setIsMobile] = useState(null);
-  const [credits, setCredits] = useState(null); // Add this state to store credits
   const creditRef = useRef();
   const [checkTAS, setCheckTAS] = useState(false);
   const [showTACPopup, setShowTACPopup] = useState(false);
   const [tacLoading, setTacLoading] = useState(false);
-  const [creditsLoaded, setCreditsLoaded] = useState(false);
-
   const [isImgLoading, setIsImgLoading] = useState(false);
   const prefixLengths = {
     "+91": 10, // India with prefix and space
@@ -74,6 +73,10 @@ const Page = () => {
     "+64": 9, // New Zealand
     // Add more country codes and their respective phone number lengths as needed
   };
+
+  const dispatch = useDispatch();
+  const credits = useSelector((state) => state.credits.value);
+  const creditsLoading = useSelector((state) => state.credits.loading);
 
   // Effect for handling mobile responsiveness
   useEffect(() => {
@@ -91,18 +94,22 @@ const Page = () => {
   // Modify creditsCall function
   async function creditsCall(email) {
     try {
+      dispatch(setCreditsLoading(true));
       const c = await getCredits(email);
+      dispatch(setCredits(c));
       if (creditRef.current) {
         creditRef.current.textContent = c;
       }
     } catch (error) {
       console.error("Error fetching credits:", error);
+    } finally {
+      dispatch(setCreditsLoading(false));
     }
   }
 
   useEffect(() => {
     const fetchTermsAndConditions = async () => {
-      console.log("session", session);
+      // console.log("session", session);
       if (session) {
         await creditsCall(session?.user?.email);
         const checkTaS = await TermsAndConditions(session?.user?.email);
@@ -149,36 +156,42 @@ const Page = () => {
   function PopOverForPrefix() {
     const prefixData = useSelector((state) => state.phoneNoInput.prefix);
     const dispatch = useDispatch();
+    // Add this line to control popover state
+    const [open, setOpen] = useState(false);
 
     useEffect(() => {
       dispatch(setPhoneNo(prefixData + " "));
-      console.log("prefix", prefixData);
+      // console.log("prefix", prefixData);
     }, [prefixData, dispatch]);
 
     return (
-      <Popover>
+      <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger>
           <IoIosArrowDropdownCircle
             size={31}
-            className=" bg-[#e2e2e2] text-[#3f3f3f] box-content rounded-md p-[15px]   cursor-pointer  md:p-[22px] border-[#767676] border-4  md:border-8 md:border-r-0 border-r-0 active:ml-3 hover:opacity-90 transition-all duration-150 rounded-tr-none rounded-br-none md:py-0 h-[28px] md:min-h-[70px]"
+            className="bg-[#e2e2e2] text-[#3f3f3f] box-content rounded-md p-[15px] cursor-pointer md:p-[22px] border-[#767676] border-4 md:border-8 md:border-r-0 border-r-0 active:translate-x-1 hover:bg-opacity-90 transition-all duration-150 rounded-tr-none rounded-br-none md:py-0 h-[28px] md:min-h-[70px] shadow-inner"
           />
         </PopoverTrigger>
-        <PopoverContent className="bg-[#e2e2e2] p-0">
-          <div className="w-[60px] md:w-[75px] max-h-[200px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
+        <PopoverContent className="bg-[#e2e2e2] p-1.5 border-2 border-[#767676] shadow-lg w-auto">
+          <div className="w-[100px] xs:w-[120px] sm:w-[130px] md:w-[140px] max-h-[250px] md:max-h-[300px] overflow-y-auto scrollbar-thin scrollbar-thumb-[#767676] scrollbar-track-[#e2e2e2] rounded-md">
             {Object.entries(prefixLengths).map(([prefix, length]) => (
               <div
                 key={prefix}
                 onClick={() => {
                   dispatch(setPrefix(prefix));
                   dispatch(setPhoneNo(prefix + " "));
+                  setOpen(false); // Close popover after selection
                 }}
-                className={`p-2 transition-all select-none duration-150 cursor-pointer px-5 ${
+                className={`p-2 md:p-2.5 transition-all select-none duration-150 cursor-pointer flex items-center justify-between gap-1 border-b border-[#d1d1d1] last:border-b-0 text-sm ${
                   prefix === prefixData
-                    ? "bg-[#3f3f3f] text-white hover:bg-[#3f3f3f]"
-                    : "hover:bg-[#c8c8c8]"
+                    ? "bg-[#3f3f3f] text-white hover:bg-[#4a4a4a]"
+                    : "hover:bg-[#d1d1d1]"
                 }`}
               >
-                <p className="flex items-center justify-center">{prefix}</p>
+                <span className="font-medium text-xs md:text-sm">{prefix}</span>
+                <span className="text-[10px] md:text-xs opacity-75">
+                  ({length})
+                </span>
               </div>
             ))}
           </div>
@@ -334,8 +347,7 @@ const Page = () => {
         toast.error("Please login first!");
         return;
       }
-      // console.log("sssss", creditRef.current.textContent);
-      if (creditRef.current?.textContent == 0) {
+      if (credits === 0) {
         toast.error("Don't have enough credits!");
         setTimeout(() => {
           router.push("payment");
@@ -385,9 +397,9 @@ const Page = () => {
 
     useEffect(() => {
       const cid = searchParams.get("cid");
-      console.log("cid", cid);
+      // console.log("cid", cid);
       if (cid) {
-        console.log("cid", cid);
+        // console.log("cid", cid);
         serverSEvent(cid);
         handleScroll("down");
         handleScroll("down");
@@ -395,20 +407,20 @@ const Page = () => {
     }, [searchParams]);
 
     const serverSEvent = async (sid) => {
-      console.log("sid", sid);
+      // console.log("sid", sid);
       let setStarted = false;
       const eventSource = new EventSource(`/api/call-status-check?sid=${sid}`);
 
       eventSource.onopen = () => {
-        console.log("Connection to server opened.");
+        // console.log("Connection to server opened.");
         setSseEstablished(true);
         setIsRestart(false);
       };
 
       eventSource.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        console.log("Received server-side event:", data);
-        console.log("data.Data.status", data?.Data?.status);
+        // console.log("Received server-side event:", data);
+        // console.log("data.Data.status", data?.Data?.status);
 
         if (data?.Data?.status == "completed" && data?.Data?.recordingUrl) {
           setRecUrl(data?.Data?.recordingUrl);
@@ -417,7 +429,7 @@ const Page = () => {
           eventSource.close();
           setSseEstablished(false);
         }
-        // console.log("recUrl", recUrl);
+        // // console.log("recUrl", recUrl);
 
         if (data?.Data?.status) {
           if (data?.Data?.status == "ringing") {
@@ -458,7 +470,7 @@ const Page = () => {
       };
 
       eventSource.onclose = () => {
-        console.log("Event source closed");
+        // console.log("Event source closed");
         setSseEstablished(false);
         setIsRestart(true);
       };
@@ -511,11 +523,11 @@ const Page = () => {
                 dispatch(setPlayingAudio(null));
               } else {
                 dispatch(setExternalAudioUnload(true));
-                console.log("changing :");
+                // console.log("changing :");
               }
             }
 
-            console.log("sid", data.twilioCall.callSid);
+            // console.log("sid", data.twilioCall.callSid);
             window.history.replaceState(
               null,
               "",
@@ -524,7 +536,7 @@ const Page = () => {
 
             // router.replace(`home/?cid=${data.twilioCall.callSid}`);
             serverSEvent(data.twilioCall.callSid);
-            console.log("Audio selected uploaded successfully:", data);
+            // console.log("Audio selected uploaded successfully:", data);
             toast.success("Audio uploaded successfully", {
               position: "top-left",
             });
@@ -554,7 +566,7 @@ const Page = () => {
                 dispatch(setPlayingAudio(null));
               } else {
                 dispatch(setExternalAudioUnload(true));
-                console.log("changing :");
+                // console.log("changing :");
               }
             }
 
@@ -566,7 +578,7 @@ const Page = () => {
             );
 
             serverSEvent(data.callResponse.callSid);
-            console.log("Audio file uploaded successfully:", data);
+            // console.log("Audio file uploaded successfully:", data);
             toast.success("Audio uploaded successfully", {
               position: "top-left",
             });
@@ -589,12 +601,22 @@ const Page = () => {
     };
 
     useEffect(() => {
-      console.log("statusColor", statusColor);
+      // console.log("statusColor", statusColor);
     }, [statusColor]);
+
+    const handleCopyUrl = async () => {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success("Link copied to clipboard!");
+      } catch (error) {
+        console.error("Error copying:", error);
+        toast.error("Failed to copy link");
+      }
+    };
 
     // JSX for Content component
     return (
-      <div className={`${poppins.className} w-full h-[100%] `}>
+      <div className="w-full h-[100%] ">
         <section className="flex overflow-auto">
           <div className="w-full h-[calc(100svh-60px)] min-h-[500px] overflow-auto  flex items-center justify-center">
             <div
@@ -633,14 +655,14 @@ const Page = () => {
                       <label className="block text-white text-right mb-2 text-lg w-[60%] max-w-[360px]">
                         Recipient&apos;s number
                       </label>
-                      <div className="relative flex items-center gap-[2px] justify-center">
+                      <div className="relative flex items-center gap-[2px] justify-center group">
                         <PopOverForPrefix />
                         <Input
                           ref={inputRef}
                           type="text"
                           value={phoneNo}
                           onChange={handlePhoneNoChange}
-                          className={`${poppins.className} relative box-border text-xl p-4 px-2  pl-3 placeholder:text-xl w-[60%] text-[#3f3f3f] min-w-[200px] bg-[#e2e2e2] max-w-[360px] font-semibold placeholder:text-black placeholder:font-semibold transition-all md:min-w-[300px] md:text-2xl md:p-5 md:pl-3 md:placeholder:text-2xl  md:border-8 duration-150 border-[#767676] border-4   placeholder:opacity-45 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none mx-0 border-l-0 md:border-l-0 rounded-tl-none rounded-bl-none py-0 md:py-0 md:h-[87px] h-[65px]  `}
+                          className="relative box-border text-xl p-4 px-2  pl-3 placeholder:text-xl w-[60%] text-[#3f3f3f] min-w-[200px] bg-[#e2e2e2] max-w-[360px] font-semibold placeholder:text-[#666] placeholder:font-medium transition-all md:min-w-[300px] md:text-2xl md:p-5 md:pl-3 md:placeholder:text-2xl  md:border-8 duration-150 border-[#767676] border-4   placeholder:opacity-75 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none mx-0 border-l-0 md:border-l-0 rounded-tl-none rounded-bl-none py-0 md:py-0 md:h-[87px] h-[65px] shadow-inner focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
                           placeholder="Mobile Number"
                         />
                       </div>
@@ -655,11 +677,19 @@ const Page = () => {
                       <button
                         disabled={!isActive}
                         onClick={handleContinue}
-                        className={`bg-[#e2e2e2] text-[#242424] px-4 py-3 rounded-md hover:bg-opacity-70 transition-all font-bold duration-150 md:px-6 md:py-4 md:text-xl ${
-                          isActive ? "opacity-100" : "opacity-50"
+                        className={`bg-[#e2e2e2] text-[#242424] px-6 py-3.5 rounded-md hover:bg-opacity-90 active:scale-95 transition-all font-bold duration-150 md:px-8 md:py-4 md:text-xl shadow-md hover:shadow-lg flex items-center gap-2 ${
+                          isActive
+                            ? "opacity-100 transform hover:-translate-y-0.5"
+                            : "opacity-50 cursor-not-allowed"
                         }`}
                       >
                         Continue
+                        <IoIosSend
+                          size={20}
+                          className={`${
+                            isActive ? "group-hover:translate-x-1" : ""
+                          } transition-transform`}
+                        />
                       </button>
                     </motion.div>
                   </div>
@@ -681,16 +711,19 @@ const Page = () => {
                   <div className="relative flex items-center justify-between w-full   h-10 select-none   text-black px-4">
                     {/* <TbArrowBackUp size={35} className="text-white" /> */}
                     <div
-                      className="p-2 py-1 hover:bg-[#444444] font-semibold transition-all active:scale-95 cursor-pointer duration-150 rounded-full"
+                      className="p-2.5 py-2 hover:bg-[#444444] font-semibold transition-all active:scale-95 cursor-pointer duration-150 rounded-full hover:shadow-md"
                       onClick={() => {
                         handleScroll("up");
                         handleScroll("up");
                       }}
                     >
-                      <TbArrowBackUp size={25} className="text-white" />
+                      <TbArrowBackUp
+                        size={25}
+                        className="text-white hover:rotate-45 transition-transform duration-200"
+                      />
                     </div>
                     <button
-                      className={`font-semibold bg-white flex items-center justify-center p-3 transition-all w-28 active:scale-90 cursor-pointer duration-150 rounded-sm  shadow-lg ${
+                      className={`font-semibold bg-white flex items-center justify-center p-3.5 transition-all w-auto min-w-[120px] active:scale-95 cursor-pointer duration-150 rounded-md shadow-md hover:shadow-lg transform hover:-translate-y-0.5 ${
                         audioFile != null || audioSelected != null
                           ? "opacity-100"
                           : "opacity-50 cursor-not-allowed"
@@ -698,7 +731,19 @@ const Page = () => {
                       onClick={handleUploadAudio}
                       disabled={!(audioSelected != null || audioFile != null)}
                     >
-                      {isLoading ? <Loader3 /> : "Set Audio"}
+                      {isLoading ? (
+                        <Loader3 />
+                      ) : (
+                        <>
+                          <span className="text-sm md:text-base whitespace-nowrap px-1">
+                            Set Audio
+                          </span>
+                          <IoMusicalNotes
+                            size={18}
+                            className="ml-1.5 md:ml-2 min-w-[18px] md:min-w-[20px]"
+                          />
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>
@@ -738,7 +783,7 @@ const Page = () => {
                           </span>
                         )}
                         {isRestart && (
-                          <>
+                          <div className="flex items-center gap-4">
                             <VscDebugRestart
                               onClick={() => {
                                 handleScroll("up");
@@ -750,12 +795,15 @@ const Page = () => {
                               size={25}
                               className="opacity-70 mt-5 cursor-pointer hover:opacity-100 active:scale-90 transition-all duration-150"
                             />
-                            <span className="hidden">
-                              {setTimeout(() => {
-                                perfectScroll();
-                              }, 1000) && null}
-                            </span>
-                          </>
+                            {/* Add copy URL button */}
+                            {status === "recordingUrl" && (
+                              <FaCopy
+                                onClick={handleCopyUrl}
+                                size={22}
+                                className="opacity-70 mt-5 cursor-pointer hover:opacity-100 active:scale-90 transition-all duration-150 text-blue-400"
+                              />
+                            )}
+                          </div>
                         )}
                       </p>
                     </div>
@@ -775,15 +823,13 @@ const Page = () => {
 
   // Effect for logging image loading state
   useEffect(() => {
-    console.log("isImgLoading", isImgLoading);
+    // console.log("isImgLoading", isImgLoading);
   }, [isImgLoading]);
 
   // Sidebar Component
   const SideBar = () => {
     return isMobile != null ? (
-      <div
-        className={`${poppins.className} relative w-[25%] min-w-[200px] max-w-[300px] border-l-[2px] border-[#3f3f3f] h-[calc(100svh-60px)]`}
-      >
+      <div className="relative w-[25%] min-w-[200px] max-w-[300px] border-l-[2px] border-[#3f3f3f] h-[calc(100svh-60px)]">
         {/* User profile image */}
         <div className="w-[100px] h-[100px] rounded-full overflow-hidden mx-auto mt-10 border-[5px] border-[#3f3f3f]">
           {session && isImgLoading && session?.user?.image ? (
@@ -800,30 +846,67 @@ const Page = () => {
           )}
         </div>
         {/* User info section */}
-        <div className=" mt-4">
+        <div className="mt-4">
           {session ? (
-            <div className="text-center flex flex-col items-start bg-[#3f3f3f] p-2 rounded-md mx-auto w-[90%] border-[2px] border-[#444444] text-white ">
-              <p className="text-white truncate w-full flex items-start">
-                {session?.user.email}
-              </p>
-              <p className="text-white my-2">
-                {/* Credits left: {credits ? credits : "..."} */}
-                Credits left: <span ref={creditRef}></span>
-              </p>
-              <Link href={"/payment"} className="flex  gap-2  items-center">
-                Credits <FaArrowRight className="text-green-600 text-[18px]" />
+            <div className="text-center flex flex-col items-start bg-[#3f3f3f] p-2.5 rounded-md mx-auto w-[90%] border-[2px] border-[#444444] text-white">
+              <div className="w-full">
+                <p className="text-white text-sm md:text-base w-full break-words overflow-hidden">
+                  {session?.user.email.length > 20
+                    ? `${session?.user.email.substring(0, 20)}...`
+                    : session?.user.email}
+                </p>
+              </div>
+              <div className="flex items-center justify-between w-full my-2 bg-[#2d2d2d] p-2 rounded-md">
+                <span className="text-sm md:text-base">Balance:</span>
+                {creditsLoading ? (
+                  <span className="inline-flex items-center justify-center">
+                    <svg
+                      className="animate-spin h-4 w-4 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                  </span>
+                ) : (
+                  <span className="font-semibold text-green-400">
+                    {credits}
+                  </span>
+                )}
+              </div>
+              <Link
+                href={"/payment"}
+                className="w-full bg-gradient-to-r from-yellow-700/70 to-yellow-600/80 hover:from-yellow-600/60 hover:to-yellow-500/60 px-3 py-2 rounded-md transition-all duration-300 flex items-center justify-center gap-2 group"
+              >
+                <span className="text-sm font-semibold text-yellow-100">
+                  Add Credits
+                </span>
+                <BsPiggyBank className="text-yellow-100 group-hover:scale-110 transition-transform duration-200" />
               </Link>
             </div>
           ) : (
             <>
-              <Skeleton className="h-4 w-3/4 mx-auto mb-2  bg-[#444444]" />
+              <Skeleton className="h-4 w-3/4 mx-auto mb-2 bg-[#444444]" />
               <Skeleton className="h-4 w-1/2 mx-auto bg-[#444444]" />
             </>
           )}
         </div>
         {/* Logout and Help buttons */}
         {session && (
-          <div className="fixed md:absolute bottom-4 right-1 left-1 flex gap-2 flex-col md:flex-row px-2 md:px-0">
+          <div className="fixed md:absolute bottom-4 right-1 left-1 flex gap-2 flex-col px-2 md:px-4">
             <button
               onClick={() => {
                 signOut({ redirect: false })
@@ -834,13 +917,23 @@ const Page = () => {
                     console.error("Logout error:", error);
                   });
               }}
-              className="bg-red-500 bg-opacity-50 text-white px-2 md:px-4 py-1 md:py-2 rounded-md hover:bg-opacity-70 transition-all duration-300 flex text-xs md:text-sm items-center justify-center gap-1 md:gap-2 w-full min-w-[80px]"
+              className="relative overflow-hidden bg-gradient-to-r from-red-500/50 to-red-600/50 hover:from-red-500/60 hover:to-red-600/60 text-white px-4 py-2.5 rounded-md transition-all duration-300 flex text-xs sm:text-sm items-center justify-center gap-2 w-full shadow-md hover:shadow-lg transform hover:-translate-y-0.5 active:translate-y-0 font-medium group"
             >
-              Logout <IoIosExit size={16} className="opacity-75" />
+              <span>Logout</span>
+              <IoIosExit
+                size={16}
+                className="min-w-[16px] transition-transform group-hover:rotate-180 duration-300"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
             </button>
-            <Link href="/contact" className="w-full">
-              <button className="bg-blue-500 bg-opacity-50 text-white px-2 md:px-4 py-1 md:py-2 rounded-md hover:bg-opacity-70 transition-all duration-300 flex text-xs md:text-sm items-center justify-center gap-1 md:gap-2 w-full min-w-[80px]">
-                Help
+            <Link href="/contact" className="w-full block">
+              <button className="relative overflow-hidden bg-gradient-to-r from-blue-500/50 to-blue-600/50 hover:from-blue-500/60 hover:to-blue-600/60 text-white px-4 py-2.5 rounded-md transition-all duration-300 flex text-xs sm:text-sm items-center justify-center gap-2 w-full shadow-md hover:shadow-lg transform hover:-translate-y-0.5 active:translate-y-0 font-medium group">
+                <span>Help Center</span>
+                <IoMdHelpCircle
+                  size={18}
+                  className="min-w-[18px] transition-transform group-hover:rotate-12 duration-300"
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
               </button>
             </Link>
           </div>

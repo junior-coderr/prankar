@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 const base = "https://api-m.paypal.com";
 
 const createOrder = async (data, email) => {
-  console.log("data :2:", data);
+  // console.log("data :2:", data);
   try {
     let total = 0;
     const credits = data.credits;

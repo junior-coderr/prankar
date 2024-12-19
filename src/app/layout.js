@@ -1,5 +1,12 @@
 import "./globals.css";
 import { scheduleCronJob } from "../lib/corn";
+import { Poppins } from "next/font/google";
+
+const poppins = Poppins({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-poppins",
+});
 
 scheduleCronJob();
 export const metadata = {
@@ -12,7 +19,13 @@ import { Toaster } from "react-hot-toast";
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${poppins.variable}`} suppressHydrationWarning>
+      <head>
+        <script
+          src="https://checkout.razorpay.com/v1/checkout.js"
+          async
+        ></script>
+      </head>
       <body className="w-full h-full bg-[#2F322F]">
         <NextAuthSessionProvider>
           <main className="w-[100%] bg-[#2F322F] h-[100svh] relative max-w-[1600px] flex m-auto">

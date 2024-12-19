@@ -41,7 +41,7 @@ const AudioUploadCard = () => {
 
       // Set the new audio file
       dispatch(setAudioFile(file));
-      console.log(file);
+      // console.log(file);
     } else {
       alert("Please upload an MP3 audio file.");
       dispatch(setAudioFile(null));

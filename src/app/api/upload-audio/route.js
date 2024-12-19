@@ -14,7 +14,7 @@ async function getAudioFromDB() {
         await connect();
         let audio = await preloadedaudio.find({});
         audioArr = audio[0].audios;
-        // console.log("audio in default sendiiii", audioArr);
+        // // console.log("audio in default sendiiii", audioArr);
         resolve();
       } catch (error) {
         console.error("Error getting audio from DB:", error);
@@ -39,7 +39,7 @@ async function audioSelectedUpload(request, email) {
     const res = await request.json();
     const selectedAudioIndex = res.audioSelected;
     const phoneNo = res.phoneNo.replace(" ", "");
-    console.log("phoneNo", phoneNo);
+    // console.log("phoneNo", phoneNo);
     if (audioArr == null) {
       await getAudioFromDB();
     }
@@ -47,7 +47,7 @@ async function audioSelectedUpload(request, email) {
     if (audioArr != null) {
       // audioArr = audioArr.flat();
       const selectedAudio = audioArr[selectedAudioIndex];
-      console.log("selectedAudio", selectedAudio);
+      // console.log("selectedAudio", selectedAudio);
 
       const twilioCall = await callTwilio(selectedAudio, phoneNo, email);
       return {
@@ -73,9 +73,9 @@ async function audioSelectedUpload(request, email) {
 // Main POST handler for audio uploads
 export async function POST(request) {
   try {
-    console.log("request.headers", request.headers);
+    // console.log("request.headers", request.headers);
     const email = request.headers.get("x-user-email");
-    console.log("email upload audio", email);
+    // console.log("email upload audio", email);
 
     if (!email) {
       return NextResponse.json(
@@ -86,7 +86,7 @@ export async function POST(request) {
 
     const user = await User.findOne({ email: email });
     const credits = user.credits;
-    console.log("credits", credits);
+    // console.log("credits", credits);
     if (credits <= 0) {
       return NextResponse.json(
         { message: "Insufficient credits" },

@@ -38,10 +38,48 @@ module.exports = {
             height: "0",
           },
         },
+        wiggle: {
+          "0%, 100%": { transform: "rotate(-5deg)" },
+          "50%": { transform: "rotate(5deg)" },
+        },
+        shake: {
+          "0%, 100%": { transform: "translateX(0)" },
+          "25%": { transform: "translateX(-2px)" },
+          "75%": { transform: "translateX(2px)" },
+        },
+        bounce: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-5px)" },
+        },
+        "translate-x": {
+          "0%, 100%": { transform: "translateX(0)" },
+          "50%": { transform: "translateX(1px)" },
+        },
+        "translate-y": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(1px)" },
+        },
+        "translate-y-neg": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-1px)" },
+        },
+        "hat-lift": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-2px)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        wiggle: "wiggle 0.5s ease-in-out infinite",
+        shake: "shake 0.5s ease-in-out infinite",
+        bounce: "bounce 0.5s ease-in-out infinite",
+        "shake-interval": "shake 2s ease-in-out infinite",
+        "bounce-interval": "bounce 2s ease-in-out infinite",
+        "translate-x-interval": "translate-x 2s ease-in-out infinite",
+        "translate-y-interval": "translate-y 2s ease-in-out infinite",
+        "translate-y-neg-interval": "translate-y-neg 2s ease-in-out infinite",
+        "hat-lift": "hat-lift 0.5s ease-in-out infinite",
       },
       borderRadius: {
         lg: "var(--radius)",

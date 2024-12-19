@@ -14,7 +14,7 @@ export async function middleware(req) {
 
   // Access the user's email from the token
   const userEmail = token.email;
-  console.log("userEmail in middleware", userEmail);
+  // console.log("userEmail in middleware", userEmail);
   const Header = new Headers(req.headers);
   Header.set("x-user-email", userEmail);
   const responseHeader = NextResponse.next({

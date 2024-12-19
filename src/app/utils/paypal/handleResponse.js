@@ -1,6 +1,6 @@
 export async function handleResponse(response) {
   try {
-    // console.log("response from capture :", response);
+    // // console.log("response from capture :", response);
 
     const jsonResponse = await response.json();
 
@@ -14,7 +14,7 @@ export async function handleResponse(response) {
     //       unit.payments = JSON.stringify(unit.payments);
     //     }
 
-    //     console.log("unit:", unit);
+    //     // console.log("unit:", unit);
     //   });
     // }
     let parsedAmount = { value: 0 }; // Define parsedAmount outside the if block
@@ -22,13 +22,13 @@ export async function handleResponse(response) {
       const d = JSON.stringify(jsonResponse.purchase_units[0].payments);
       jsonResponse.purchase_units[0].payments = d;
       const parsedPayments = JSON.parse(d);
-      console.log("unit:", parsedPayments);
+      // console.log("unit:", parsedPayments);
       const amount = JSON.stringify(parsedPayments.captures[0].amount);
       parsedAmount = JSON.parse(amount);
       // parsedAmount = parsedAmount.value;
-      console.log("parsedAmount:", parsedAmount.value);
+      // console.log("parsedAmount:", parsedAmount.value);
     }
-    // console.log(
+    // // console.log(
     //   "Parsed response from capture:",
     //   JSON.stringify(jsonResponse.purchase_units[0].payments)
     // );

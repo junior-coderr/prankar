@@ -46,7 +46,7 @@ export const scheduleCronJob = async () => {
           await Promise.all(deletePromises);
         }
 
-        console.log(
+        // console.log(
           `Deleted ${deletedCount} blobs from container: ${containerClient.containerName}`
         );
       };
@@ -55,11 +55,11 @@ export const scheduleCronJob = async () => {
       for (const containerName of containerNames) {
         const containerClient =
           blobServiceClient.getContainerClient(containerName);
-        console.log(`Starting cleanup for container: ${containerName}`);
+        // console.log(`Starting cleanup for container: ${containerName}`);
         await deleteOldBlobs(containerClient);
       }
 
-      console.log("Blob deletion task completed for all containers.");
+      // console.log("Blob deletion task completed for all containers.");
 
       //deleting the sqllite db content which are older than 24 hours
       const db = await createTable(); // Connecting to the database
@@ -72,7 +72,7 @@ export const scheduleCronJob = async () => {
       `;
 
         const result = await db.run(deleteQuery); // Execute the deletion query
-        console.log(`Deleted ${result.changes} rows from callStatus table.`);
+        // console.log(`Deleted ${result.changes} rows from callStatus table.`);
       } catch (error) {
         // Roll back the transaction in case of error
         // await db.run("ROLLBACK");

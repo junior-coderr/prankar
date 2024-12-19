@@ -125,7 +125,7 @@ export default function Home() {
   return (
     <>
       {/* Main container for the entire page */}
-      <main className="w-[100%] bg-[#2F322F] h-[calc(100svh-60px)] min-h-[500px] relative">
+      <main className="w-[100%] bg-[#2F322F] h-[calc(100svh-60px)] min-h-[600px] relative">
         {/* Animated wrapper for the Headbar component */}
         <motion.div
           initial={{ opacity: 0, scale: 0.98 }}
@@ -182,7 +182,8 @@ export default function Home() {
                   flexDirection: "column",
                   justifyContent: "center",
                   alignItems: "center",
-                  margin: "0 auto",
+                  margin: "10px auto",
+                  paddingBottom: "20px",
                 }}
               >
                 {/* Component for the shiny button */}

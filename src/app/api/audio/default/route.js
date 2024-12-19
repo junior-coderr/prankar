@@ -7,7 +7,7 @@ export async function GET(req) {
     await connect();
     let audio = await preloadedaudio.find({});
     audio = audio[0].audios;
-    // console.log("audio in default sendi", audio);
+    // // console.log("audio in default sendi", audio);
     return NextResponse.json({ audio }, { status: 200 });
   } catch (error) {
     console.error("Error fetching audio:", error);

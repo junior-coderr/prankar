@@ -10,8 +10,8 @@ import User from "app/utils/MongoSchema/user";
 const captureOrder = async (orderID, email) => {
   const accessToken = await generateAccessToken();
   const url = `${base}/v2/checkout/orders/${orderID}/capture`;
-  console.log("captureOrder url:", url);
-  console.log("orderID:", orderID);
+  // console.log("captureOrder url:", url);
+  // console.log("orderID:", orderID);
   if (!email) {
     return NextResponse.json(
       {
@@ -57,13 +57,13 @@ const captureOrder = async (orderID, email) => {
       credits = Math.round((Number(amount) - 0.3) / 0.1229);
     }
 
-    console.log("credits::", credits);
+    // console.log("credits::", credits);
     const user = await User.findOneAndUpdate(
       { email },
       { $inc: { credits: credits } },
       { new: true }
     ).exec();
-    console.log("user updated", user);
+    // console.log("user updated", user);
   }
 
   // TODO: if not updated db success then update in hook success so that we can have sse for check, now update in sqllite db about this faliure
@@ -80,9 +80,9 @@ export async function POST(req, { params }) {
       id,
       userData.email
     );
-    console.log("this is running !!");
-    console.log("jsonResponse: ", jsonResponse);
-    console.log("httpStatusCode: ", httpStatusCode);
+    // console.log("this is running !!");
+    // console.log("jsonResponse: ", jsonResponse);
+    // console.log("httpStatusCode: ", httpStatusCode);
     return NextResponse.json(jsonResponse, { status: httpStatusCode });
   } catch (error) {
     console.error("Failed to create order:", error);

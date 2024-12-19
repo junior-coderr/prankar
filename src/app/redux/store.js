@@ -8,6 +8,7 @@ import externalAudioUnloadReducer from "./slices/ExternalAudioUnload";
 import transaction from "./slices/transaction.payment";
 import pageStateReducer from "./slices/pageState";
 import persistedStateReducer from "./slices/persistedState";
+import creditsReducer from "./slices/credits";
 
 export const store = configureStore({
   reducer: {
@@ -20,5 +21,6 @@ export const store = configureStore({
     transaction: transaction,
     pageState: pageStateReducer,
     persistedState: persistedStateReducer,
+    credits: creditsReducer,
   },
 });

@@ -11,7 +11,7 @@ export default async function TermsAndConditions(email) {
     const response = await result.json();
     return response;
   } catch (error) {
-    console.log("Error:", error);
+    // console.log("Error:", error);
     return null;
   }
 }
