@@ -5,10 +5,10 @@ export default async function connect() {
   try {
     if (mongoose.connection.readyState === 0) {
       await mongoose.connect(uri, {});
-      // console.log("Connected to MongoDB");
+      //  console.log("Connected to MongoDB");
       return true;
     } else {
-      // console.log("Already connected to MongoDB");
+      //  console.log("Already connected to MongoDB");
       return true;
     }
   } catch (error) {

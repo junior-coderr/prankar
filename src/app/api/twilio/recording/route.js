@@ -10,7 +10,7 @@ export async function POST(req) {
     const text = await req.text(); // Get the raw text from the request
     const params = new URLSearchParams(text); // Parse the text as form data
     const queryParams = Object.fromEntries(new URL(req.url).searchParams);
-    // console.log("Query Params:", queryParams);
+    //  console.log("Query Params:", queryParams);
     const email = queryParams?.email;
 
     // Convert form data to an object
@@ -24,15 +24,15 @@ export async function POST(req) {
       { new: true }
     ).exec();
 
-    // // console.log("user updated", user);
+    // //  console.log("user updated", user);
 
     // Extract necessary information
     const { CallSid, RecordingUrl } = body;
-    // // console.log("CallSid", CallSid);
+    // //  console.log("CallSid", CallSid);
     const stdUrl = RecordingUrl;
-    // console.log("stdUrl", stdUrl);
+    //  console.log("stdUrl", stdUrl);
     const publicRecordingUrl = await customAudioUpload(null, "flex", stdUrl);
-    // console.log("publicRecordingUrl", publicRecordingUrl.audioFileUrl);
+    //  console.log("publicRecordingUrl", publicRecordingUrl.audioFileUrl);
 
     const db = await createTable();
     await db.run("UPDATE callStatus SET recordingUrl = ? WHERE sid = ?", [
@@ -41,7 +41,7 @@ export async function POST(req) {
     ]);
 
     const rows = await db.all("SELECT * FROM callStatus");
-    // // console.log("Table rows:", rows);
+    // //  console.log("Table rows:", rows);
 
     return NextResponse.json(
       {

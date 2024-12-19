@@ -54,7 +54,7 @@ export function TabsDemo() {
       className="w-[85%] min-w-[250px] h-full mx-auto pt-2"
       onValueChange={(value) => {
         handlePlayPause(value, true);
-        // console.log("value", value);
+        //  console.log("value", value);
       }}
     >
       <TabsList className="flex justify-center bg-[#3f3f3f] text-white items-center w-full">

@@ -10,7 +10,7 @@ export async function POST(req) {
 
     // Verify webhook signature
     const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
-    // console.log("Using webhook secret:", webhookSecret?.slice(0, 4) + "..."); // Log partial secret for debugging
+    //  console.log("Using webhook secret:", webhookSecret?.slice(0, 4) + "..."); // Log partial secret for debugging
 
     const expectedSignature = createHmac("sha256", webhookSecret || "")
       .update(body)
@@ -30,7 +30,7 @@ export async function POST(req) {
     const payload = JSON.parse(body);
 
     const { event, payload: eventPayload } = payload;
-    // console.log("payload", payload);
+    //  console.log("payload", payload);
 
     // Handle different webhook events
     switch (event) {
@@ -38,13 +38,13 @@ export async function POST(req) {
         // Extract email from payment entity
         const email = eventPayload.payment.entity.email;
         const notes = eventPayload.payment.entity.notes;
-        // console.log("Customer email:", email);
-        // console.log("Payment details:", {
-          email,
-          notes,
-          amount: eventPayload.payment.entity.amount,
-          paymentId: eventPayload.payment.entity.id,
-        });
+        //  console.log("Customer email:", email);
+        //  console.log("Payment details:", {
+        //   email,
+        //   notes,
+        //   amount: eventPayload.payment.entity.amount,
+        //   paymentId: eventPayload.payment.entity.id,
+        // });
 
         // Connect to MongoDB
         await connect();
@@ -57,17 +57,17 @@ export async function POST(req) {
           { $inc: { credits: units } },
           { new: true }
         );
-        // console.log("User credits updated:", user);
+        //  console.log("User credits updated:", user);
 
         break;
 
       case "payment.failed":
         // Handle failed payment
-        // console.log("Payment failed:", eventPayload.payment.entity);
+        //  console.log("Payment failed:", eventPayload.payment.entity);
         break;
 
       default:
-        // console.log("Unhandled event:", event);
+      //  console.log("Unhandled event:", event);
     }
 
     return NextResponse.json({ status: "ok" }, { status: 200 });

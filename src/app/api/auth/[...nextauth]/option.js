@@ -60,7 +60,7 @@ const Options = {
             image: user.user.image,
           });
           await newUser.save();
-          // console.log("User created ");
+          //  console.log("User created ");
         }
         return true;
       } catch (error) {

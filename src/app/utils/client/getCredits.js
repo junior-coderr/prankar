@@ -1,6 +1,6 @@
 async function getCredits(email) {
   try {
-    // console.log("email xjs", email);
+    //  console.log("email xjs", email);
     const get = await fetch("/api/client/getCredits", {
       method: "POST",
       headers: {
@@ -8,10 +8,10 @@ async function getCredits(email) {
       },
       body: JSON.stringify({ email }),
     });
-    // console.log("fetch xjs", get);
+    //  console.log("fetch xjs", get);
     const response = await get.json();
 
-    // console.log("response xjs", response);
+    //  console.log("response xjs", response);
     if (response.success) {
       return response.credits;
     } else {

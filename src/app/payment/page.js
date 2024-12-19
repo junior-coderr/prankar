@@ -97,12 +97,12 @@ const Payment = () => {
           bg: "#4caf50",
         });
       }
-      // console.log("Received SSE data:", data);
+      //  console.log("Received SSE data:", data);
       // Handle the received data
     };
 
     eventSource.onopen = () => {
-      // console.log("SSE connection opened.");
+      //  console.log("SSE connection opened.");
       // toast.loading("Processing payment");
     };
 
@@ -180,7 +180,7 @@ const Payment = () => {
     const { data: session } = useSession();
 
     // React.useEffect(() => {
-    //   // console.log("session", session);
+    //   //  console.log("session", session);
     // }, [session]);
 
     const initialOptions = {
@@ -195,8 +195,8 @@ const Payment = () => {
     };
 
     React.useEffect(() => {
-      // console.log("credits new :", credits);
-      // console.log("elements: new", element);
+      //  console.log("credits new :", credits);
+      //  console.log("elements: new", element);
     }, [element, credits]);
     const style = {
       layout: "vertical",
@@ -223,8 +223,8 @@ const Payment = () => {
               disabled={element < 0 && credits === "0" ? true : false}
               style={style}
               createOrder={async () => {
-                // // console.log("currentSelect 22", element);
-                // // console.log("amount 22", credits);
+                // //  console.log("currentSelect 22", element);
+                // //  console.log("amount 22", credits);
                 try {
                   const response = await fetch("/api/payment/createOrder", {
                     method: "POST",
@@ -241,7 +241,7 @@ const Payment = () => {
                   const orderData = await response.json();
 
                   if (orderData.id) {
-                    // console.log("orderData.id", orderData.id);
+                    //  console.log("orderData.id", orderData.id);
                     return orderData.id;
                   } else {
                     const errorDetail = orderData?.details?.[0];
@@ -256,7 +256,7 @@ const Payment = () => {
                 }
               }}
               onApprove={async (data, actions) => {
-                // console.log("onApprove:", data, "action:", actions);
+                //  console.log("onApprove:", data, "action:", actions);
                 try {
                   const response = await fetch(
                     `/api/payment/captureOrder/${data.orderID}`,
@@ -277,7 +277,7 @@ const Payment = () => {
                   //   (2) Other non-recoverable errors -> Show a failure message
                   //   (3) Successful transaction -> Show confirmation or thank you message
 
-                  // console.log("orderData", orderData);
+                  //  console.log("orderData", orderData);
 
                   const errorDetail = orderData?.details?.[0];
 

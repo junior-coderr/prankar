@@ -18,15 +18,15 @@ export async function POST(request) {
 
         const query2 = `SELECT * FROM paymentStatus WHERE email = ?`;
         const data = await db.all(query2, [email]);
-        // console.log("Payment Status Table: added", data);
+        //  console.log("Payment Status Table: added", data);
       } catch (err) {
-        // console.log("error", err);
+        //  console.log("error", err);
         return NextResponse.json(
           { error: "Internal Server Error", success: false },
           { status: 500 }
         );
       }
-      // console.log("success body from success hook: ", body);
+      //  console.log("success body from success hook: ", body);
     }
 
     return NextResponse.json(

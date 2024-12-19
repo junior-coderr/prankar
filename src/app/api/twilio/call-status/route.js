@@ -11,7 +11,7 @@ async function handler(req) {
     const text = await req.text(); // Get the raw text from the request
     const params = new URLSearchParams(text); // Parse the text as form data
 
-    // // console.log("Email: from check status", email);
+    // //  console.log("Email: from check status", email);
 
     // Convert form data to an object
     const body = Object.fromEntries(params);
@@ -34,7 +34,7 @@ async function handler(req) {
         [CallSid.toString(), CallStatus, null]
       );
     }
-    // console.log("Call Status:", { CallSid, CallStatus });
+    //  console.log("Call Status:", { CallSid, CallStatus });
 
     return new NextResponse(
       JSON.stringify({

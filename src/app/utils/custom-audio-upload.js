@@ -18,8 +18,8 @@ export default async function customAudioUpload(
         var phoneNo = formData.get("phoneNo");
         var audioFile = formData.get("audioFile");
         phoneNo = phoneNo.replace(" ", "");
-        // console.log("phone no from custom", phoneNo);
-        // console.log(audioFile);
+        //  console.log("phone no from custom", phoneNo);
+        //  console.log(audioFile);
 
         // Check if the audio file is provided
         if (!audioFile && type !== "flex") {
@@ -75,10 +75,10 @@ export default async function customAudioUpload(
 
       // Azure Blob Upload
       const connectionString = process.env.BLOB_C_STRING; // Changed from BLOB_C_String to BLOB_C_STRING
-      // console.log("Environment variables:", {
-        hasBlobString: !!process.env.BLOB_C_STRING,
-        blobStringLength: process.env.BLOB_C_STRING?.length,
-      });
+      //  console.log("Environment variables:", {
+      //   hasBlobString: !!process.env.BLOB_C_STRING,
+      //   blobStringLength: process.env.BLOB_C_STRING?.length,
+      // });
 
       if (!connectionString) {
         throw new Error("Azure Storage connection string is not configured");
@@ -130,7 +130,7 @@ export default async function customAudioUpload(
         callResponse = await callTwilio(audioFileUrl, phoneNo, email); // Pass the audio file URL to Twilio
       }
 
-      // console.log("Call Response:", callResponse);
+      //  console.log("Call Response:", callResponse);
 
       // Resolve the promise with success response
       resolve({

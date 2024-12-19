@@ -29,20 +29,20 @@ const SideBar = ({ props }) => {
 
   const creditsCall = useCallback(async (email) => {
     if (!email) return;
-    // // console.log("emaildwefw", email);
+    // //  console.log("emaildwefw", email);
     const c = await getCredits(email);
-    // // console.log("crredits", credits);
+    // //  console.log("crredits", credits);
     // setCredits(credits);
-    // console.log("ccc", c);
-    // console.log("dom", creditRef.current);
+    //  console.log("ccc", c);
+    //  console.log("dom", creditRef.current);
     if (creditRef.current) creditRef.current.textContent = c;
     cValue = c;
-    // // console.log("credits", credits);
+    // //  console.log("credits", credits);
   }, []);
 
   useEffect(() => {
     creditsCall(props.content.user.email);
-    // console.log("ggg", props.content.user.image);
+    //  console.log("ggg", props.content.user.image);
   }, [props.content, creditsCall]);
 
   return (

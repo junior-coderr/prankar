@@ -109,7 +109,7 @@ const Page = () => {
 
   useEffect(() => {
     const fetchTermsAndConditions = async () => {
-      // console.log("session", session);
+      //  console.log("session", session);
       if (session) {
         await creditsCall(session?.user?.email);
         const checkTaS = await TermsAndConditions(session?.user?.email);
@@ -161,7 +161,7 @@ const Page = () => {
 
     useEffect(() => {
       dispatch(setPhoneNo(prefixData + " "));
-      // console.log("prefix", prefixData);
+      //  console.log("prefix", prefixData);
     }, [prefixData, dispatch]);
 
     return (
@@ -397,9 +397,9 @@ const Page = () => {
 
     useEffect(() => {
       const cid = searchParams.get("cid");
-      // console.log("cid", cid);
+      //  console.log("cid", cid);
       if (cid) {
-        // console.log("cid", cid);
+        //  console.log("cid", cid);
         serverSEvent(cid);
         handleScroll("down");
         handleScroll("down");
@@ -407,20 +407,20 @@ const Page = () => {
     }, [searchParams]);
 
     const serverSEvent = async (sid) => {
-      // console.log("sid", sid);
+      //  console.log("sid", sid);
       let setStarted = false;
       const eventSource = new EventSource(`/api/call-status-check?sid=${sid}`);
 
       eventSource.onopen = () => {
-        // console.log("Connection to server opened.");
+        //  console.log("Connection to server opened.");
         setSseEstablished(true);
         setIsRestart(false);
       };
 
       eventSource.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        // console.log("Received server-side event:", data);
-        // console.log("data.Data.status", data?.Data?.status);
+        //  console.log("Received server-side event:", data);
+        //  console.log("data.Data.status", data?.Data?.status);
 
         if (data?.Data?.status == "completed" && data?.Data?.recordingUrl) {
           setRecUrl(data?.Data?.recordingUrl);
@@ -429,7 +429,7 @@ const Page = () => {
           eventSource.close();
           setSseEstablished(false);
         }
-        // // console.log("recUrl", recUrl);
+        // //  console.log("recUrl", recUrl);
 
         if (data?.Data?.status) {
           if (data?.Data?.status == "ringing") {
@@ -470,7 +470,7 @@ const Page = () => {
       };
 
       eventSource.onclose = () => {
-        // console.log("Event source closed");
+        //  console.log("Event source closed");
         setSseEstablished(false);
         setIsRestart(true);
       };
@@ -523,11 +523,11 @@ const Page = () => {
                 dispatch(setPlayingAudio(null));
               } else {
                 dispatch(setExternalAudioUnload(true));
-                // console.log("changing :");
+                //  console.log("changing :");
               }
             }
 
-            // console.log("sid", data.twilioCall.callSid);
+            //  console.log("sid", data.twilioCall.callSid);
             window.history.replaceState(
               null,
               "",
@@ -536,7 +536,7 @@ const Page = () => {
 
             // router.replace(`home/?cid=${data.twilioCall.callSid}`);
             serverSEvent(data.twilioCall.callSid);
-            // console.log("Audio selected uploaded successfully:", data);
+            //  console.log("Audio selected uploaded successfully:", data);
             toast.success("Audio uploaded successfully", {
               position: "top-left",
             });
@@ -566,7 +566,7 @@ const Page = () => {
                 dispatch(setPlayingAudio(null));
               } else {
                 dispatch(setExternalAudioUnload(true));
-                // console.log("changing :");
+                //  console.log("changing :");
               }
             }
 
@@ -578,7 +578,7 @@ const Page = () => {
             );
 
             serverSEvent(data.callResponse.callSid);
-            // console.log("Audio file uploaded successfully:", data);
+            //  console.log("Audio file uploaded successfully:", data);
             toast.success("Audio uploaded successfully", {
               position: "top-left",
             });
@@ -601,7 +601,7 @@ const Page = () => {
     };
 
     useEffect(() => {
-      // console.log("statusColor", statusColor);
+      //  console.log("statusColor", statusColor);
     }, [statusColor]);
 
     const handleCopyUrl = async () => {
@@ -823,7 +823,7 @@ const Page = () => {
 
   // Effect for logging image loading state
   useEffect(() => {
-    // console.log("isImgLoading", isImgLoading);
+    //  console.log("isImgLoading", isImgLoading);
   }, [isImgLoading]);
 
   // Sidebar Component
