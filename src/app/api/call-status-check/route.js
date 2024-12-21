@@ -11,10 +11,35 @@ export async function GET(request) {
       let interval;
       let isSetTimeout = false;
       let isBusy = false;
+      let isControllerClosed = false;
+      let timeoutId = null;
+
+      const safeCloseController = () => {
+        if (!isControllerClosed) {
+          isControllerClosed = true; // Set flag first
+          if (interval) {
+            clearInterval(interval);
+            interval = null;
+            console.log("Interval cleared");
+          }
+          if (timeoutId) {
+            clearTimeout(timeoutId);
+            timeoutId = null;
+          }
+          try {
+            controller.close();
+            console.log("Controller closed");
+          } catch (error) {
+            console.log("Controller already closed or invalid");
+          }
+        }
+      };
+
       const push = async () => {
+        if (isControllerClosed) return;
+
         try {
           const db = await createTable();
-
           const dbData = await db.get(
             "SELECT * FROM callStatus WHERE sid = ?",
             sid.toString()
@@ -22,11 +47,7 @@ export async function GET(request) {
 
           if (!dbData) {
             console.log("No data found");
-            if (controller) {
-              controller.close();
-              clearInterval(interval);
-              console.log("Interval cleared");
-            }
+            safeCloseController();
             return;
           }
 
@@ -35,74 +56,54 @@ export async function GET(request) {
             Data: dbData,
             timestamp: new Date().toISOString(),
           });
-          controller.enqueue(`data: ${data}\n\n`);
-          console.log("Pushed data:", data);
-          // Continue sending data every second
 
-          console.log("dbData.status", dbData?.status);
-          if (!dbData?.status) {
+          try {
+            if (!isControllerClosed) {
+              controller.enqueue(`data: ${data}\n\n`);
+              console.log("Pushed data:", data);
+            }
+          } catch (error) {
+            console.log("Failed to enqueue data, closing controller");
+            safeCloseController();
             return;
           }
-          if (dbData?.status === "completed") {
-            if (isSetTimeout) {
-              return;
-            }
-            isSetTimeout = true;
-            setTimeout(() => {
-              if (interval) {
-                clearInterval(interval);
-                console.log("Interval cleared");
+
+          if (!dbData?.status) return;
+
+          switch (dbData.status) {
+            case "completed":
+              if (!isSetTimeout) {
+                isSetTimeout = true;
+                if (timeoutId) clearTimeout(timeoutId);
+                timeoutId = setTimeout(safeCloseController, 16000);
               }
-              if (controller) {
-                controller.close();
-                console.log("Controller closed");
+              break;
+            case "busy":
+              if (!isBusy) {
+                isBusy = true;
+                if (timeoutId) clearTimeout(timeoutId);
+                timeoutId = setTimeout(safeCloseController, 6000);
               }
-              isSetTimeout = false;
-              // return;
-            }, 16000);
-          } else if (
-            dbData?.status === "initiated" ||
-            dbData?.status === "in-progress" ||
-            dbData?.status === "ringing"
-          ) {
-            // return;
-          } else if (dbData?.status === "busy") {
-            if (isBusy) {
-              return;
-            }
-            isBusy = true;
-            setTimeout(() => {
-              if (interval) {
-                clearInterval(interval);
-                console.log("Interval cleared");
-              }
-              if (controller) {
-                controller.close();
-                console.log("Controller closed");
-              }
-              isBusy = false;
-              // clearInterval(interval);
-              console.log("Interval cleared");
-              // isBusy = false;
-            }, 6000);
-          } else {
-            if (controller) {
-              controller.close();
-              clearInterval(interval);
-              console.log("Interval cleared");
-            }
+              break;
+            case "initiated":
+            case "in-progress":
+            case "ringing":
+              break;
+            default:
+              safeCloseController();
           }
         } catch (error) {
           console.error("Failed to push data:", error);
-          if (controller) {
-            controller.close();
-            clearInterval(interval);
-            console.log("Interval cleared by catch");
-            controller.error(error);
-          }
+          safeCloseController();
         }
       };
+
       interval = setInterval(push, 5000);
+
+      // Cleanup function
+      return () => {
+        safeCloseController();
+      };
     },
   });
 

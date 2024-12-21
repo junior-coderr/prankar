@@ -39,6 +39,7 @@ import {
 } from "../../app/redux/slices/persistedState";
 import { setAudioFile } from "../../app/redux/slices/audioFile";
 import { setAudioSelected } from "../../app/redux/slices/audioSelected";
+import { setCredits, setCreditsLoading } from "../redux/slices/credits";
 
 import { Poppins } from "next/font/google";
 const poppins = Poppins({
@@ -49,11 +50,13 @@ import { VscDebugRestart } from "react-icons/vsc";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { usePathname, useSearchParams } from "next/navigation";
+import { IoArrowForward } from "react-icons/io5";
+import { FaHeadphones } from "react-icons/fa6";
 
 // Main Page Component
 const Page = () => {
+  const dispatch = useDispatch(); // Add this at the top of the component
   const [isMobile, setIsMobile] = useState(null);
-  const [credits, setCredits] = useState(null); // Add this state to store credits
   const creditRef = useRef();
   const [checkTAS, setCheckTAS] = useState(false);
   const [showTACPopup, setShowTACPopup] = useState(false);
@@ -91,12 +94,15 @@ const Page = () => {
   // Modify creditsCall function
   async function creditsCall(email) {
     try {
+      dispatch(setCreditsLoading(true));
       const c = await getCredits(email);
+      dispatch(setCredits(c));
       if (creditRef.current) {
         creditRef.current.textContent = c;
       }
     } catch (error) {
       console.error("Error fetching credits:", error);
+      dispatch(setCreditsLoading(false));
     }
   }
 
@@ -152,7 +158,6 @@ const Page = () => {
 
     useEffect(() => {
       dispatch(setPhoneNo(prefixData + " "));
-      console.log("prefix", prefixData);
     }, [prefixData, dispatch]);
 
     return (
@@ -160,11 +165,11 @@ const Page = () => {
         <PopoverTrigger>
           <IoIosArrowDropdownCircle
             size={31}
-            className=" bg-[#e2e2e2] text-[#3f3f3f] box-content rounded-md p-[15px]   cursor-pointer  md:p-[22px] border-[#767676] border-4  md:border-8 md:border-r-0 border-r-0 active:ml-3 hover:opacity-90 transition-all duration-150 rounded-tr-none rounded-br-none md:py-0 h-[28px] md:min-h-[70px]"
+            className="bg-[#e2e2e2] text-[#3f3f3f] box-content rounded-md p-[15px] cursor-pointer md:p-[22px] border-[#767676] border-4 md:border-8 md:border-r-0 border-r-0 active:ml-3 hover:opacity-90 transition-all duration-150 rounded-tr-none rounded-br-none md:py-0 h-[28px] md:min-h-[70px]"
           />
         </PopoverTrigger>
-        <PopoverContent className="bg-[#e2e2e2] p-0">
-          <div className="w-[60px] md:w-[75px] max-h-[200px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
+        <PopoverContent className="bg-[#e2e2e2] p-1 w-[180px] shadow-lg border-2 border-[#767676]">
+          <div className="max-h-[250px] overflow-y-auto scrollbar-thin scrollbar-thumb-[#3f3f3f] scrollbar-track-gray-100">
             {Object.entries(prefixLengths).map(([prefix, length]) => (
               <div
                 key={prefix}
@@ -172,13 +177,14 @@ const Page = () => {
                   dispatch(setPrefix(prefix));
                   dispatch(setPhoneNo(prefix + " "));
                 }}
-                className={`p-2 transition-all select-none duration-150 cursor-pointer px-5 ${
+                className={`flex items-center justify-between px-4 py-2.5 transition-all select-none duration-150 cursor-pointer rounded-md ${
                   prefix === prefixData
                     ? "bg-[#3f3f3f] text-white hover:bg-[#3f3f3f]"
-                    : "hover:bg-[#c8c8c8]"
+                    : "hover:bg-[#d1d1d1]"
                 }`}
               >
-                <p className="flex items-center justify-center">{prefix}</p>
+                <span className="font-medium">{prefix}</span>
+                <span className="text-sm opacity-60">{length} digits</span>
               </div>
             ))}
           </div>
@@ -596,7 +602,7 @@ const Page = () => {
     return (
       <div className={`${poppins.className} w-full h-[100%] `}>
         <section className="flex overflow-auto">
-          <div className="w-full h-[calc(100svh-60px)] min-h-[500px] overflow-auto  flex items-center justify-center">
+          <div className="w-full h-[calc(100svh-60px)] min-h-[670px] overflow-auto  flex items-center justify-center">
             <div
               ref={scrollRef}
               className={`${
@@ -655,11 +661,12 @@ const Page = () => {
                       <button
                         disabled={!isActive}
                         onClick={handleContinue}
-                        className={`bg-[#e2e2e2] text-[#242424] px-4 py-3 rounded-md hover:bg-opacity-70 transition-all font-bold duration-150 md:px-6 md:py-4 md:text-xl ${
+                        className={`bg-[#e2e2e2] text-[#242424] px-4 py-2.5 sm:px-5 sm:py-3 rounded-md hover:bg-opacity-70 transition-all font-bold duration-150 flex items-center justify-center gap-2 text-base sm:text-lg md:text-xl ${
                           isActive ? "opacity-100" : "opacity-50"
                         }`}
                       >
-                        Continue
+                        <span>Continue</span>
+                        <IoArrowForward className="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:translate-x-1" />
                       </button>
                     </motion.div>
                   </div>
@@ -690,7 +697,7 @@ const Page = () => {
                       <TbArrowBackUp size={25} className="text-white" />
                     </div>
                     <button
-                      className={`font-semibold bg-white flex items-center justify-center p-3 transition-all w-28 active:scale-90 cursor-pointer duration-150 rounded-sm  shadow-lg ${
+                      className={`font-semibold bg-white flex items-center justify-center gap-2 px-4 py-2.5 transition-all min-w-[120px] sm:min-w-[140px] active:scale-90 cursor-pointer duration-150 rounded-sm shadow-lg ${
                         audioFile != null || audioSelected != null
                           ? "opacity-100"
                           : "opacity-50 cursor-not-allowed"
@@ -698,7 +705,16 @@ const Page = () => {
                       onClick={handleUploadAudio}
                       disabled={!(audioSelected != null || audioFile != null)}
                     >
-                      {isLoading ? <Loader3 /> : "Set Audio"}
+                      {isLoading ? (
+                        <Loader3 />
+                      ) : (
+                        <>
+                          <span className="text-sm sm:text-base">
+                            Set Audio
+                          </span>
+                          <FaHeadphones className="w-4 h-4 sm:w-5 sm:h-5 text-[#3f3f3f]" />
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>
@@ -779,80 +795,156 @@ const Page = () => {
   }, [isImgLoading]);
 
   // Sidebar Component
-  const SideBar = () => {
-    return isMobile != null ? (
+  const SideBar = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
+    const credits = useSelector((state) => state.credits.value);
+    const isCreditsLoading = useSelector((state) => state.credits.isLoading);
+
+    return (
       <div
-        className={`${poppins.className} relative w-[25%] min-w-[200px] max-w-[300px] border-l-[2px] border-[#3f3f3f] h-[calc(100svh-60px)]`}
+        className={`${poppins.className} ${
+          isMobile
+            ? `fixed top-[60px] right-0 z-50 transform transition-transform duration-300 ${
+                isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
+              }`
+            : "relative"
+        } w-[85%] sm:w-[70%] md:w-[25%] min-w-[280px] max-w-[300px] bg-[#3f3f3f] h-[calc(100svh-60px)] shadow-xl`}
       >
-        {/* User profile image */}
-        <div className="w-[100px] h-[100px] rounded-full overflow-hidden mx-auto mt-10 border-[5px] border-[#3f3f3f]">
-          {session && isImgLoading && session?.user?.image ? (
-            <Skeleton className="w-full h-full bg-[#444444] shadow-md" />
-          ) : (
-            <Image
-              src={session?.user?.image}
-              alt=" "
-              width={100}
-              height={100}
-              onLoadingComplete={() => setIsImgLoading(false)}
-              className="object-cover mx-auto bg-[#444444] shadow-md"
-            />
-          )}
+        {/* Mobile close button */}
+        {isMobile && (
+          <button
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="absolute top-4 right-4 text-white p-2.5 rounded-full bg-[#ffffff14] hover:bg-[#ffffff22] active:scale-95 transition-all duration-150"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        )}
+
+        {/* User profile section with improved responsive sizing */}
+        <div className="w-full flex flex-col items-center pt-14 sm:pt-16 md:pt-8 pb-6 px-4">
+          <div className="relative w-[90px] sm:w-[100px] md:w-[120px] h-[90px] sm:h-[100px] md:h-[120px] rounded-full overflow-hidden border-4 border-[#4a4a4a] shadow-lg transform hover:scale-105 transition-transform duration-300">
+            {session && isImgLoading && session?.user?.image ? (
+              <Skeleton className="w-full h-full bg-[#444444] animate-pulse" />
+            ) : (
+              <Image
+                src={session?.user?.image}
+                alt=""
+                width={120}
+                height={120}
+                onLoadingComplete={() => setIsImgLoading(false)}
+                className="object-cover w-full h-full"
+              />
+            )}
+          </div>
         </div>
-        {/* User info section */}
-        <div className=" mt-4">
+
+        {/* User info card with improved spacing */}
+        <div className="px-4 sm:px-5 md:px-6">
           {session ? (
-            <div className="text-center flex flex-col items-start bg-[#3f3f3f] p-2 rounded-md mx-auto w-[90%] border-[2px] border-[#444444] text-white ">
-              <p className="text-white truncate w-full flex items-start">
-                {session?.user.email}
-              </p>
-              <p className="text-white my-2">
-                {/* Credits left: {credits ? credits : "..."} */}
-                Credits left: <span ref={creditRef}></span>
-              </p>
-              <Link href={"/payment"} className="flex  gap-2  items-center">
-                Credits <FaArrowRight className="text-green-600 text-[18px]" />
-              </Link>
+            <div className="backdrop-blur-md bg-[#ffffff0a] rounded-xl p-3 sm:p-4 shadow-lg border border-[#ffffff1a]">
+              <div className="space-y-2.5 sm:space-y-3">
+                <p className="text-gray-200 text-xs sm:text-sm truncate font-medium">
+                  {session?.user.email}
+                </p>
+                <div className="flex items-center justify-between py-2 border-t border-[#ffffff1a]">
+                  <span className="text-gray-300 text-xs sm:text-sm">
+                    Credits left:
+                  </span>
+                  {isCreditsLoading ? (
+                    <div className="w-4 h-4 rounded-full border-2 border-green-400 border-t-transparent animate-spin" />
+                  ) : (
+                    <span
+                      ref={creditRef}
+                      className="text-green-400 font-semibold text-xs sm:text-sm"
+                    >
+                      {credits}
+                    </span>
+                  )}
+                </div>
+                <Link
+                  href="/payment"
+                  className="flex items-center justify-between w-full px-3 sm:px-4 py-2.5 text-xs sm:text-sm text-white bg-[#ffffff14] hover:bg-[#ffffff22] rounded-lg transition-all duration-300 active:scale-[0.98]"
+                >
+                  <span>Get More Credits</span>
+                  <FaArrowRight className="text-green-400 text-xs sm:text-sm" />
+                </Link>
+              </div>
             </div>
           ) : (
-            <>
-              <Skeleton className="h-4 w-3/4 mx-auto mb-2  bg-[#444444]" />
-              <Skeleton className="h-4 w-1/2 mx-auto bg-[#444444]" />
-            </>
+            <div className="space-y-3">
+              <Skeleton className="h-4 w-3/4 bg-[#444444]" />
+              <Skeleton className="h-4 w-1/2 bg-[#444444]" />
+            </div>
           )}
         </div>
-        {/* Logout and Help buttons */}
+
+        {/* Action buttons with improved responsive layout */}
         {session && (
-          <div className="fixed md:absolute bottom-4 right-1 left-1 flex gap-2 flex-col md:flex-row px-2 md:px-0">
-            <button
-              onClick={() => {
-                signOut({ redirect: false })
-                  .then(() => {
+          <div className="absolute bottom-6 left-0 right-0 px-4 sm:px-5 md:px-6 space-y-2 sm:space-y-3 md:space-y-0 md:space-x-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 w-full">
+              <button
+                onClick={() => {
+                  signOut({ redirect: false }).then(() => {
                     window.location.href = "/";
-                  })
-                  .catch((error) => {
-                    console.error("Logout error:", error);
                   });
-              }}
-              className="bg-red-500 bg-opacity-50 text-white px-2 md:px-4 py-1 md:py-2 rounded-md hover:bg-opacity-70 transition-all duration-300 flex text-xs md:text-sm items-center justify-center gap-1 md:gap-2 w-full min-w-[80px]"
-            >
-              Logout <IoIosExit size={16} className="opacity-75" />
-            </button>
-            <Link href="/contact" className="w-full">
-              <button className="bg-blue-500 bg-opacity-50 text-white px-2 md:px-4 py-1 md:py-2 rounded-md hover:bg-opacity-70 transition-all duration-300 flex text-xs md:text-sm items-center justify-center gap-1 md:gap-2 w-full min-w-[80px]">
-                Help
+                }}
+                className="flex items-center justify-center gap-2 px-4 py-2.5 sm:py-3 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-lg transition-all duration-300 active:scale-[0.98] text-xs sm:text-sm w-full"
+              >
+                <span>Logout</span>
+                <IoIosExit className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
-            </Link>
+              <Link href="/contact" className="w-full">
+                <button className="flex items-center justify-center gap-2 px-4 py-2.5 sm:py-3 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 rounded-lg transition-all duration-300 active:scale-[0.98] text-xs sm:text-sm w-full">
+                  <span>Help</span>
+                </button>
+              </Link>
+            </div>
           </div>
         )}
       </div>
-    ) : null;
+    );
   };
 
-  // Main component return
+  // Main component return with mobile menu toggle
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   return (
     <div className="w-full h-[calc(100svh)]">
-      <Header />
+      <Header>
+        {isMobile && session && (
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="ml-auto p-2 text-white hover:bg-[#ffffff14] rounded-full transition-colors duration-300"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16m-7 6h7"
+              />
+            </svg>
+          </button>
+        )}
+      </Header>
       <TermsACPopup
         open={showTACPopup}
         onAccept={handleAcceptTerms}
@@ -862,8 +954,17 @@ const Page = () => {
         <div className="w-full h-[100%] overflow-auto min-h-[500px]">
           <Content />
         </div>
-        {!isMobile ? <SideBar /> : null}
-        {/* {<SideBar />} */}
+        <SideBar
+          isMobileMenuOpen={isMobileMenuOpen}
+          setIsMobileMenuOpen={setIsMobileMenuOpen}
+        />
+        {/* Mobile overlay */}
+        {isMobile && isMobileMenuOpen && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-40"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+        )}
       </section>
     </div>
   );
